@@ -1,11 +1,10 @@
-'use client';
+"use client";
 
 import { useParams, notFound } from 'next/navigation';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useCart } from '../../../context/cart-context';
 import { useToast } from '../../../hooks/use-toast';
-import { PlaceHolderImages, ImagePlaceholder } from '../../../lib/placeholder-images';
 import {
   Button
 } from '../../../components/ui/button';
@@ -25,6 +24,19 @@ interface ProductVariant {
   description?: string;
 }
 
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  image_url: string;
+  image_url_back?: string;
+  category: string;
+  availableSizes?: string[];
+  variants?: ProductVariant[];
+  tags?: string[];
+}
+
 export default function ProductDetailPage() {
   const params = useParams();
   const id = typeof params.id === 'string' ? params.id : '';
@@ -32,7 +44,7 @@ export default function ProductDetailPage() {
   const { addToCart } = useCart();
   const { toast } = useToast();
 
-  const [product, setProduct] = useState<ImagePlaceholder | null>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -40,19 +52,23 @@ export default function ProductDetailPage() {
   useEffect(() => {
     if (!id) return;
 
-    const fetchProduct = () => {
+    const fetchProduct = async () => {
       setLoading(true);
-      const foundProduct = PlaceHolderImages.find(p => String(p.id) === id);
+      try {
+        const res = await fetch(`http://localhost:3001/products/${id}`); // Endpoint de tu backend
+        if (!res.ok) throw new Error('Producto no encontrado');
+        const data: Product = await res.json();
+        setProduct(data);
 
-      if (foundProduct) {
-        setProduct(foundProduct);
-        if (foundProduct.variants && foundProduct.variants.length > 0) {
-          setSelectedVariant(foundProduct.variants[0]);
+        if (data.variants && data.variants.length > 0) {
+          setSelectedVariant(data.variants[0]);
         }
-      } else {
+      } catch (err: any) {
+        console.error(err);
         setProduct(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchProduct();
@@ -67,6 +83,8 @@ export default function ProductDetailPage() {
   }
 
   const handleAddToCart = () => {
+    if (!product) return;
+
     let productToAdd: any;
     let sizeInfo: string | undefined = undefined;
     let toastDescription: string;
@@ -120,11 +138,19 @@ export default function ProductDetailPage() {
           {/* Imagen */}
           <div className="relative aspect-square">
             <Image
-              src={product.imageUrl || '/placeholder.png'}
+              src={product.image_url}
               alt={displayName}
               fill
               className="object-contain rounded-lg shadow-lg"
             />
+            {product.image_url_back && (
+              <Image
+                src={product.image_url_back}
+                alt={`${displayName} (back)`}
+                fill
+                className="object-contain rounded-lg shadow-lg absolute top-0 left-0 opacity-0 hover:opacity-100 transition-opacity"
+              />
+            )}
           </div>
 
           {/* Detalles */}

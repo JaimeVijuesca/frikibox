@@ -11,70 +11,7 @@ import { ShoppingCart, Search, Filter } from 'lucide-react';
 import { useCart } from '../../context/cart-context';
 import { useToast } from "../../hooks/use-toast";
 import { useRouter } from 'next/navigation';
-import { ImagePlaceholder, PlaceHolderImages } from '../../lib/placeholder-images';
 import { Skeleton } from '../../components/ui/skeleton';
-
-function ProductCard({ product, handleAddToCart }: { product: ImagePlaceholder, handleAddToCart: (e: React.MouseEvent, product: ImagePlaceholder) => void }) {
-  const getButtonText = (product: ImagePlaceholder) => {
-    if (product.category === 'clothing' || product.variants) {
-      return 'Ver Opciones';
-    }
-    return 'Añadir';
-  };
-
-  return (
-    <Link href={`/product/${product.id}`} passHref>
-      <Card className="overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col h-full group">
-        <CardContent className="p-0 relative aspect-square">
-          <Image
-            src={product.imageUrl}
-            alt={product.name}
-            fill
-            className="object-cover w-full h-full transition-all duration-500 group-hover:scale-105"
-            data-ai-hint={product.imageHint}
-          />
-          {product.imageUrlBack && (
-            <Image
-              src={product.imageUrlBack}
-              alt={`${product.name} (back)`}
-              fill
-              className="object-cover w-full h-full transition-all duration-500 opacity-0 group-hover:opacity-100"
-              data-ai-hint={product.imageHint}
-            />
-          )}
-        </CardContent>
-        <CardHeader>
-          <CardTitle className="text-lg transition-colors group-hover:text-primary">{product.name}</CardTitle>
-        </CardHeader>
-        <CardFooter className="flex justify-between items-center mt-auto pt-4">
-          <span className="text-xl font-bold">{product.price ? `${product.price?.toFixed(2)}€` : `Desde ${product.variants?.[0].price.toFixed(2)}€`}</span>
-          <Button onClick={(e) => handleAddToCart(e, product)}>
-            <ShoppingCart className="mr-2 h-4 w-4" />
-            {getButtonText(product)}
-          </Button>
-        </CardFooter>
-      </Card>
-    </Link>
-  );
-}
-
-function ProductCardSkeleton() {
-  return (
-    <Card className="overflow-hidden rounded-lg shadow-lg flex flex-col h-full">
-      <CardContent className="p-0 relative aspect-square">
-        <Skeleton className="w-full h-full" />
-      </CardContent>
-      <CardHeader>
-        <Skeleton className="h-6 w-3/4" />
-      </CardHeader>
-      <CardFooter className="flex justify-between items-center mt-auto pt-4">
-        <Skeleton className="h-8 w-1/4" />
-        <Skeleton className="h-10 w-1/2" />
-      </CardFooter>
-    </Card>
-  );
-}
-
 
 export default function ProductsPage() {
   const { addToCart } = useCart();
@@ -82,17 +19,33 @@ export default function ProductsPage() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFranchise, setSelectedFranchise] = useState<string>('all');
-  const [products, setProducts] = useState<ImagePlaceholder[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // --- Fetch productos desde la API ---
   useEffect(() => {
-    const productItems = PlaceHolderImages.filter(
-      p => p.id !== 'hero' && p.id !== 'founder-photo'
-    );
-    setProducts(productItems);
-    setIsLoading(false);
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      try {
+        const res = await fetch('http://localhost:3001/products/all'); // tu endpoint
+        if (!res.ok) throw new Error('Error al cargar productos');
+        const data = await res.json();
+        setProducts(data);
+      } catch (err: any) {
+        console.error(err);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: err.message,
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProducts();
   }, []);
-  
+
   const groupedFranchises = useMemo(() => {
     if (!products) return {};
     const groups: Record<string, Set<string>> = {};
@@ -117,15 +70,14 @@ export default function ProductsPage() {
     if (selectedFranchise !== 'all') {
         productsToShow = products.filter(p => p.mainFranchise === selectedFranchise);
     }
-    
+
     // Filter by search term
     const filtered = productsToShow.filter(product => {
       const term = searchTerm.toLowerCase();
-      const searchMatch = (
+      return (
           product.name.toLowerCase().includes(term) ||
-          product.tags?.some(tag => tag.toLowerCase().includes(term))
+          product.tags?.some((tag: string) => tag.toLowerCase().includes(term))
       );
-      return searchMatch;
     });
 
     // Sort by name
@@ -133,7 +85,7 @@ export default function ProductsPage() {
 
   }, [products, searchTerm, selectedFranchise]);
 
-  const handleAddToCart = (e: React.MouseEvent, product: ImagePlaceholder) => {
+  const handleAddToCart = (e: React.MouseEvent, product: any) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -211,5 +163,63 @@ export default function ProductsPage() {
         )}
       </div>
     </section>
+  );
+}
+
+// -------------------- ProductCard y ProductCardSkeleton --------------------
+function ProductCard({ product, handleAddToCart }: { product: any, handleAddToCart: (e: React.MouseEvent, product: any) => void }) {
+  const getButtonText = (product: any) => {
+    if (product.category === 'clothing' || product.variants) return 'Ver Opciones';
+    return 'Añadir';
+  };
+
+  return (
+    <Link href={`/product/${product.id}`} passHref>
+      <Card className="overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col h-full group">
+        <CardContent className="p-0 relative aspect-square">
+          <Image
+            src={product.image_url}
+            alt={product.name}
+            fill
+            className="object-cover w-full h-full transition-all duration-500 group-hover:scale-105"
+          />
+          {product.image_url_back && (
+            <Image
+              src={product.image_url_back}
+              alt={`${product.name} (back)`}
+              fill
+              className="object-cover w-full h-full transition-all duration-500 opacity-0 group-hover:opacity-100"
+            />
+          )}
+        </CardContent>
+        <CardHeader>
+          <CardTitle className="text-lg transition-colors group-hover:text-primary">{product.name}</CardTitle>
+        </CardHeader>
+        <CardFooter className="flex justify-between items-center mt-auto pt-4">
+          <span className="text-xl font-bold">{product.price ? `${product.price?.toFixed(2)}€` : `Desde ${product.variants?.[0]?.price?.toFixed(2)}€`}</span>
+          <Button onClick={(e) => handleAddToCart(e, product)}>
+            <ShoppingCart className="mr-2 h-4 w-4" />
+            {getButtonText(product)}
+          </Button>
+        </CardFooter>
+      </Card>
+    </Link>
+  );
+}
+
+function ProductCardSkeleton() {
+  return (
+    <Card className="overflow-hidden rounded-lg shadow-lg flex flex-col h-full">
+      <CardContent className="p-0 relative aspect-square">
+        <Skeleton className="w-full h-full" />
+      </CardContent>
+      <CardHeader>
+        <Skeleton className="h-6 w-3/4" />
+      </CardHeader>
+      <CardFooter className="flex justify-between items-center mt-auto pt-4">
+        <Skeleton className="h-8 w-1/4" />
+        <Skeleton className="h-10 w-1/2" />
+      </CardFooter>
+    </Card>
   );
 }
