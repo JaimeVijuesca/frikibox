@@ -17,29 +17,7 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
 
   const handleCheckout = async () => {
-    setLoading(true);
-    try {
-        const response = await fetch('/api/create-checkout-session', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cart }),
-        });
-
-        if (response.ok) {
-            const { url } = await response.json();
-            window.location.href = url;
-            clearCart();
-        } else {
-            throw new Error('Failed to create checkout session');
-        }
-    } catch (error) {
-        toast({
-            variant: 'destructive',
-            title: 'Error',
-            description: 'No se pudo iniciar el proceso de pago. Inténtalo de nuevo.',
-        });
-        setLoading(false);
-    }
+   
   };
 
 

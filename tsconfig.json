@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -19,9 +23,19 @@
       }
     ],
     "paths": {
-      "@/*": ["frikibox/src/*"]
+      "@/*": [
+        "frikibox/src/*"
+      ]
     }
   },
-  "include": ["frikibox/next-env.d.ts", "**/*.ts", "**/*.tsx", "frikibox/.next/.next/types/**/*.tss/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "frikibox/.next/.next/types/**/*.tss/**/*.ts",
+    "frikibox/next-env.d.ts",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
