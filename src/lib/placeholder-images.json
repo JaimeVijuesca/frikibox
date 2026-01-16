@@ -1,0 +1,17 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero",
+      "name": "Hero Background",
+      "imageUrl": "/assets/fondo.png",
+      "imageHint": "geek stuff",
+      "description": "Fondo de FrikiBox"
+    },
+    {
+      "id": "founder-photo",
+      "name": "Founder Photo",
+      "imageUrl": "/assets/about-me.png",
+      "imageHint": "man portrait"
+    }
+  ]
+}
