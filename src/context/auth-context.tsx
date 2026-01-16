@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 const ADMIN_EMAIL = 'admin@frikibox.com';
+const STORAGE_KEY = 'auth_user';
 
 interface User {
   uid: string;
@@ -25,47 +26,58 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Cargar usuario desde localStorage al iniciar
   useEffect(() => {
-    // Simulate checking for a logged-in user
-    setTimeout(() => {
-      // In a real app, you might check localStorage or a cookie
-      setLoading(false);
-    }, 500);
+    const storedUser = localStorage.getItem(STORAGE_KEY);
+
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+
+    setLoading(false);
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // This is a mock login. In a real app, you'd call your backend.
-    if (email && password) {
-      const isAdmin = email === ADMIN_EMAIL;
-      const mockUser: User = {
-        uid: `mock-${Date.now()}`,
-        name: isAdmin ? 'FrikiBOX' : 'Usuario Mock',
-        email: email,
-        isAdmin: isAdmin,
-      };
-      setUser(mockUser);
-      return true;
-    }
-    return false;
+    if (!email || !password) return false;
+
+    const isAdmin = email === ADMIN_EMAIL;
+
+    const mockUser: User = {
+      uid: `mock-${Date.now()}`,
+      name: isAdmin ? 'FrikiBOX' : 'Usuario Mock',
+      email,
+      isAdmin,
+    };
+
+    setUser(mockUser);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(mockUser));
+
+    return true;
   };
-  
-  const register = async (name: string, email: string, password: string): Promise<boolean> => {
-    // This is a mock registration.
-    if (name && email && password) {
-       const mockUser: User = {
-        uid: `mock-${Date.now()}`,
-        name: name,
-        email: email,
-        isAdmin: email === ADMIN_EMAIL,
-      };
-      setUser(mockUser);
-      return true;
-    }
-    return false;
+
+  const register = async (
+    name: string,
+    email: string,
+    password: string
+  ): Promise<boolean> => {
+    if (!name || !email || !password) return false;
+
+    const mockUser: User = {
+      uid: `mock-${Date.now()}`,
+      name,
+      email,
+      isAdmin: email === ADMIN_EMAIL,
+    };
+
+    setUser(mockUser);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(mockUser));
+
+    return true;
   };
 
   const logout = async (): Promise<boolean> => {
     setUser(null);
+    localStorage.removeItem(STORAGE_KEY);
     return true;
   };
 
@@ -78,7 +90,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
