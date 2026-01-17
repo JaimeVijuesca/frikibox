@@ -93,7 +93,7 @@ export default function CartSheet() {
                           variant="outline"
                           size="icon"
                           className="h-6 w-6"
-                          onClick={() => decreaseQuantity(item.id)}
+                          onClick={() => decreaseQuantity(item.id, item.selectedSize)}
                         >
                           <Minus className="h-4 w-4" />
                         </Button>
@@ -102,7 +102,7 @@ export default function CartSheet() {
                           variant="outline"
                           size="icon"
                           className="h-6 w-6"
-                          onClick={() => increaseQuantity(item.id)}
+                          onClick={() => increaseQuantity(item.id, undefined, item.selectedSize)}
                         >
                           <Plus className="h-4 w-4" />
                         </Button>
@@ -116,7 +116,7 @@ export default function CartSheet() {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeItem(item.id, item.selectedSize)}
                       >
                         <Trash2 className="h-4 w-4" />
                         <span className="sr-only">Quitar producto</span>

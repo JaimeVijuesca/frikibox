@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     const isAdmin = email === 'admin@frikibox.com'; // override si quieres admin
     const userData: User = {
-      uid: data.user?.uid || `mock-${Date.now()}`,
+      uid: data.user?.id ,
       name: data.user?.name || (isAdmin ? 'FrikiBOX' : 'Usuario'),
       email,
       isAdmin,
@@ -109,6 +109,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within an AuthProvider');
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
   return context;
 };
