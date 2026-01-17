@@ -1,21 +1,30 @@
 "use client";
 
-import { useParams, notFound } from 'next/navigation';
-import Image from 'next/image';
-import { useState, useEffect } from 'react';
-import { useCart } from '../../../context/cart-context';
-import { useToast } from '../../../hooks/use-toast';
+import { useParams, notFound } from "next/navigation";
+import Image from "next/image";
+import { useState, useEffect } from "react";
+import { useCart } from "../../../context/cart-context";
+import { useToast } from "../../../hooks/use-toast";
+import { Button } from "../../../components/ui/button";
+import { ShoppingCart } from "lucide-react";
 import {
-  Button
-} from '../../../components/ui/button';
-import { ShoppingCart } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
-import { Label } from '../../../components/ui/label';
-import { Card, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
-import { RadioGroup, RadioGroupItem } from '../../../components/ui/radio-group';
-import { Badge } from '../../../components/ui/badge';
-import { Skeleton } from '../../../components/ui/skeleton';
-import { cn } from '../../../lib/utils';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
+import { Label } from "../../../components/ui/label";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../../components/ui/card";
+import { RadioGroup, RadioGroupItem } from "../../../components/ui/radio-group";
+import { Badge } from "../../../components/ui/badge";
+import { Skeleton } from "../../../components/ui/skeleton";
+import { cn } from "../../../lib/utils";
 
 interface ProductVariant {
   id: string;
@@ -39,14 +48,16 @@ interface Product {
 
 export default function ProductDetailPage() {
   const params = useParams();
-  const id = typeof params.id === 'string' ? params.id : '';
+  const id = typeof params.id === "string" ? params.id : "";
 
   const { addToCart } = useCart();
   const { toast } = useToast();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
+    null
+  );
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
   useEffect(() => {
@@ -55,8 +66,9 @@ export default function ProductDetailPage() {
     const fetchProduct = async () => {
       setLoading(true);
       try {
+        console.log("id " + id);
         const res = await fetch(`http://localhost:3001/products/${id}`); // Endpoint de tu backend
-        if (!res.ok) throw new Error('Producto no encontrado');
+        if (!res.ok) throw new Error("Producto no encontrado");
         const data: Product = await res.json();
         setProduct(data);
 
@@ -97,38 +109,46 @@ export default function ProductDetailPage() {
         price: selectedVariant.price,
         description: selectedVariant.description,
         variants: undefined,
+        imageUrl: product.image_url,
       };
       toastDescription = `${selectedVariant.name} se ha añadido al carrito.`;
-    } else if (product.category === 'clothing' && selectedSize) {
+    } else if (product.category === "clothing" && selectedSize) {
       sizeInfo = selectedSize;
       productToAdd = {
         ...product,
         id: `${product.id}-${selectedSize}`,
+        imageUrl: product.image_url,
       };
       toastDescription = `${product.name} (Talla: ${selectedSize}) se ha añadido al carrito.`;
     } else {
-      productToAdd = product;
+      productToAdd = {
+        ...product,
+        imageUrl: product.image_url, // añadimos aquí también
+      };
       toastDescription = `${product.name} se ha añadido al carrito.`;
     }
 
-    if (product.category === 'clothing' && !selectedSize) {
+    if (product.category === "clothing" && !selectedSize) {
       toast({
-        variant: 'destructive',
-        title: '¡Selecciona una talla!',
-        description: 'Por favor, elige una talla antes de añadir el producto al carrito.',
+        variant: "destructive",
+        title: "¡Selecciona una talla!",
+        description:
+          "Por favor, elige una talla antes de añadir el producto al carrito.",
       });
       return;
     }
 
     addToCart(productToAdd, sizeInfo);
     toast({
-      title: '¡Añadido al carrito!',
+      title: "¡Añadido al carrito!",
       description: toastDescription,
     });
   };
 
   const displayPrice = selectedVariant ? selectedVariant.price : product.price;
-  const displayDescription = selectedVariant ? selectedVariant.description : product.description;
+  const displayDescription = selectedVariant
+    ? selectedVariant.description
+    : product.description;
   const displayName = selectedVariant ? selectedVariant.name : product.name;
 
   return (
@@ -157,16 +177,24 @@ export default function ProductDetailPage() {
           <div className="flex flex-col justify-center space-y-6">
             <div>
               <h1 className="text-3xl lg:text-4xl font-bold">{displayName}</h1>
-              {displayPrice && <p className="text-2xl font-bold mt-2">{displayPrice.toFixed(2)}€</p>}
+              {displayPrice && (
+                <p className="text-2xl font-bold mt-2">
+                  {displayPrice.toFixed(2)}€
+                </p>
+              )}
             </div>
 
-            <p className="text-muted-foreground text-lg">{displayDescription || 'No hay descripción disponible.'}</p>
+            <p className="text-muted-foreground text-lg">
+              {displayDescription || "No hay descripción disponible."}
+            </p>
 
             {/* Tags */}
             {product.tags && product.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {product.tags.map(tag => (
-                  <Badge key={tag} variant="outline">{tag}</Badge>
+                {product.tags.map((tag) => (
+                  <Badge key={tag} variant="outline">
+                    {tag}
+                  </Badge>
                 ))}
               </div>
             )}
@@ -176,7 +204,9 @@ export default function ProductDetailPage() {
               <RadioGroup
                 value={selectedVariant?.id}
                 onValueChange={(variantId) => {
-                  const newVariant = product.variants?.find(v => v.id === variantId);
+                  const newVariant = product.variants?.find(
+                    (v) => v.id === variantId
+                  );
                   setSelectedVariant(newVariant || null);
                 }}
                 className="grid gap-4"
@@ -186,8 +216,9 @@ export default function ProductDetailPage() {
                   <Card
                     key={variant.id}
                     className={cn(
-                      'cursor-pointer',
-                      selectedVariant?.id === variant.id && 'border-primary ring-2 ring-primary'
+                      "cursor-pointer",
+                      selectedVariant?.id === variant.id &&
+                        "border-primary ring-2 ring-primary"
                     )}
                     onClick={() => setSelectedVariant(variant)}
                   >
@@ -195,25 +226,35 @@ export default function ProductDetailPage() {
                       <RadioGroupItem value={variant.id} id={variant.id} />
                       <div className="w-full">
                         <div className="flex justify-between items-baseline">
-                          <CardTitle className="text-base">{variant.name}</CardTitle>
-                          <p className="font-bold text-base">{variant.price.toFixed(2)}€</p>
+                          <CardTitle className="text-base">
+                            {variant.name}
+                          </CardTitle>
+                          <p className="font-bold text-base">
+                            {variant.price.toFixed(2)}€
+                          </p>
                         </div>
-                        <CardDescription className="text-xs">{variant.description}</CardDescription>
+                        <CardDescription className="text-xs">
+                          {variant.description}
+                        </CardDescription>
                       </div>
                     </CardHeader>
                   </Card>
                 ))}
               </RadioGroup>
-            ) : product.category === 'clothing' && product.availableSizes ? (
+            ) : product.category === "clothing" && product.availableSizes ? (
               <div className="flex items-center gap-4">
-                <Label htmlFor="size-select" className="text-lg font-medium">Talla:</Label>
+                <Label htmlFor="size-select" className="text-lg font-medium">
+                  Talla:
+                </Label>
                 <Select onValueChange={setSelectedSize}>
                   <SelectTrigger id="size-select" className="w-[120px]">
                     <SelectValue placeholder="Elige..." />
                   </SelectTrigger>
                   <SelectContent>
                     {product.availableSizes.map((size) => (
-                      <SelectItem key={size} value={size}>{size}</SelectItem>
+                      <SelectItem key={size} value={size}>
+                        {size}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -222,7 +263,11 @@ export default function ProductDetailPage() {
 
             {/* Botón de añadir al carrito */}
             <div className="flex items-center gap-4">
-              <Button size="lg" onClick={handleAddToCart} disabled={product.category === 'clothing' && !selectedSize}>
+              <Button
+                size="lg"
+                onClick={handleAddToCart}
+                disabled={product.category === "clothing" && !selectedSize}
+              >
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 Añadir al carrito
               </Button>
