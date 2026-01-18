@@ -14,7 +14,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useToast } from "../../hooks/use-toast";
 import { Lock } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function CheckoutPage() {
   const { cart, total, clearCart } = useCart();
@@ -22,14 +22,49 @@ export default function CheckoutPage() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
+  // Redirigir al inicio si el carrito está vacío
+  useEffect(() => {
+    if (cart.length === 0) {
+      router.push("/");
+    }
+  }, [cart, router]);
+
   const handleCheckout = async () => {
-    
+    setLoading(true);
+    try {
+      // Llamamos a nuestro endpoint en NestJS para crear la sesión
+      const res = await fetch("http://localhost:3001/payments/payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cart }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Error al crear la sesión de pago");
+      }
+
+      const data = await res.json();
+
+      // Redirigir a Stripe Checkout
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("No se recibió la URL de Stripe");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error al procesar el pago",
+        description: error.message || "Ha ocurrido un error",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (cart.length === 0) {
-    if (typeof window !== "undefined") router.push("/");
-    return null;
-  }
+  // Mientras se redirige o no hay carrito
+  if (cart.length === 0) return null;
 
   return (
     <section className="py-12 md:py-24">
@@ -62,7 +97,7 @@ export default function CheckoutPage() {
                     <div>
                       <p className="font-medium">{item.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        Talla:{item.selectedSize}
+                        Talla: {item.selectedSize}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         Cantidad: {item.quantity}

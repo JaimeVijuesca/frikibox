@@ -21,7 +21,7 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-// 🔧 SOLO CAMBIA ESTAS DOS URLS
+// 🔧 CAMBIA ESTAS DOS URLS
 const API_URL_GET = "http://localhost:3001/cart";   // GET /:uid
 const API_URL_SAVE = "http://localhost:3001/cart";  // POST /:uid
 
@@ -35,15 +35,20 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   // 1️⃣ Cargar carrito al iniciar (visitante o usuario)
   // ---------------------------------------------------------
   useEffect(() => {
-    const loadGuestCart = () => {
-      const saved = localStorage.getItem("cart");
-      setCart(saved ? JSON.parse(saved) : []);
-      setLoaded(true);
-    };
+    // Esperar a que auth cargue
+    if (user === undefined) return;
 
+    // ❗ Si el usuario ha cerrado sesión → carrito vacío
+    if (user === null) {
+      setCart([]);
+      setLoaded(true);
+      return;
+    }
+
+    // Usuario logueado → cargar carrito del backend
     const loadUserCart = async () => {
       try {
-        const res = await fetch(`${API_URL_GET}/${user!.uid}`);
+        const res = await fetch(`${API_URL_GET}/${user.uid}`);
         const data = await res.json();
 
         const backendItems: CartItem[] = (data.items || []).map((item: any) => ({
@@ -64,11 +69,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       }
     };
 
-    // Esperar a que Firebase termine de cargar
-    if (user === undefined) return;
-
-    if (user === null) loadGuestCart();
-    else loadUserCart();
+    loadUserCart();
   }, [user]);
 
   // ---------------------------------------------------------
@@ -77,19 +78,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!loaded) return; // evita enviar [] al backend
 
-    if (user === null) {
-      // Visitante → localStorage
-      localStorage.setItem("cart", JSON.stringify(cart));
-    }
+    // Visitante → NO guardar nada (carrito vacío siempre)
+    if (user === null) return;
 
-    if (user) {
-      // Usuario → backend
-      fetch(`${API_URL_SAVE}/${user.uid}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: cart }),
-      }).catch(err => console.error("Error saving cart:", err));
-    }
+    // Usuario → guardar en backend
+    fetch(`${API_URL_SAVE}/${user!.uid}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items: cart }),
+    }).catch(err => console.error("Error saving cart:", err));
   }, [cart, user, loaded]);
 
   // ---------------------------------------------------------

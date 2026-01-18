@@ -134,7 +134,7 @@ export default function AdminPage() {
       if (newProduct.imageUrlBack)
         formData.append("imageUrlBack", newProduct.imageUrlBack);
 
-      const res = await fetch("http://localhost:3001/products", {
+      const res = await fetch("http://localhost:3001/products/create", {
         method: "POST",
         body: formData,
       });
@@ -295,7 +295,7 @@ export default function AdminPage() {
                 <label className="block font-medium">Precio (€)</label>
                 <input
                   type="number"
-                  value={newProduct.price}
+                  value={isNaN(newProduct.price) ? 0 : newProduct.price}
                   onChange={(e) =>
                     setNewProduct((prev) => ({
                       ...prev,
