@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   Sheet,
@@ -8,14 +8,14 @@ import {
   SheetTrigger,
   SheetFooter,
   SheetClose,
-} from './ui/sheet';
-import { Button } from './ui/button';
-import { ShoppingCart, Trash2, Plus, Minus } from 'lucide-react';
-import { useCart } from '../context/cart-context';
-import Image from 'next/image';
-import { Badge } from './ui/badge';
-import { ScrollArea } from './ui/scroll-area';
-import { useRouter } from 'next/navigation';
+} from "./ui/sheet";
+import { Button } from "./ui/button";
+import { ShoppingCart, Trash2, Plus, Minus } from "lucide-react";
+import { useCart } from "../context/cart-context";
+import Image from "next/image";
+import { Badge } from "./ui/badge";
+import { ScrollArea } from "./ui/scroll-area";
+import { useRouter } from "next/navigation";
 
 export default function CartSheet() {
   const {
@@ -29,8 +29,8 @@ export default function CartSheet() {
   const router = useRouter();
 
   const handleCheckout = () => {
-    router.push('/checkout');
-  }
+    router.push("/checkout");
+  };
 
   return (
     <Sheet>
@@ -70,13 +70,14 @@ export default function CartSheet() {
                 {cart.map((item) => (
                   <div key={item.id} className="flex items-center gap-4">
                     <div className="relative h-20 w-20 overflow-hidden rounded-md">
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.name}
-                        fill
-                        className="object-cover"
-                        data-ai-hint={item.imageHint}
-                      />
+                      {item.imageUrl && (
+                        <Image
+                          src={item.imageUrl}
+                          alt={item.name}
+                          fill
+                          className="object-cover"
+                        />
+                      )}
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold">{item.name}</h3>
@@ -93,7 +94,9 @@ export default function CartSheet() {
                           variant="outline"
                           size="icon"
                           className="h-6 w-6"
-                          onClick={() => decreaseQuantity(item.id, item.selectedSize)}
+                          onClick={() =>
+                            decreaseQuantity(item.id, item.selectedSize)
+                          }
                         >
                           <Minus className="h-4 w-4" />
                         </Button>
@@ -102,7 +105,13 @@ export default function CartSheet() {
                           variant="outline"
                           size="icon"
                           className="h-6 w-6"
-                          onClick={() => increaseQuantity(item.id, undefined, item.selectedSize)}
+                          onClick={() =>
+                            increaseQuantity(
+                              item.id,
+                              undefined,
+                              item.selectedSize
+                            )
+                          }
                         >
                           <Plus className="h-4 w-4" />
                         </Button>
@@ -132,7 +141,9 @@ export default function CartSheet() {
                 <span>{total.toFixed(2)}€</span>
               </div>
               <SheetClose asChild>
-                <Button className="w-full" onClick={handleCheckout}>Finalizar Compra</Button>
+                <Button className="w-full" onClick={handleCheckout}>
+                  Finalizar Compra
+                </Button>
               </SheetClose>
             </SheetFooter>
           </>

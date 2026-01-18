@@ -21,44 +21,55 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-// 🔧 CAMBIA ESTAS DOS URLS
-const API_URL_GET = "http://localhost:3001/cart";   // GET /:uid
-const API_URL_SAVE = "http://localhost:3001/cart";  // POST /:uid
+// 🔧 SOLO CAMBIA ESTAS DOS URLS
+const API_URL_GET = "http://localhost:3001/cart";
+const API_URL_SAVE = "http://localhost:3001/cart";
+
+// 🔥 Normaliza el producto para asegurar que SIEMPRE tenga imageUrl
+const normalizeProduct = (p: any): CartItem => ({
+  ...p,
+  imageUrl:
+    p.imageUrl ||
+    p.image ||
+    p.imageSrc ||
+    p.src ||
+    p.mainImage ||
+    p.image_url ||
+    "",
+});
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
 
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [loaded, setLoaded] = useState(false); // evita guardar antes de cargar
+  const [loaded, setLoaded] = useState(false);
 
   // ---------------------------------------------------------
-  // 1️⃣ Cargar carrito al iniciar (visitante o usuario)
+  // 1️⃣ Cargar carrito al iniciar
   // ---------------------------------------------------------
   useEffect(() => {
-    // Esperar a que auth cargue
-    if (user === undefined) return;
+    if (user === undefined) return; // Esperar a auth
 
-    // ❗ Si el usuario ha cerrado sesión → carrito vacío
+    // ❗ Logout → carrito vacío
     if (user === null) {
       setCart([]);
       setLoaded(true);
       return;
     }
 
-    // Usuario logueado → cargar carrito del backend
+    // Usuario logueado → cargar backend
     const loadUserCart = async () => {
       try {
         const res = await fetch(`${API_URL_GET}/${user.uid}`);
         const data = await res.json();
 
-        const backendItems: CartItem[] = (data.items || []).map((item: any) => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          imageUrl: item.imageUrl,
-          selectedSize: item.selectedSize || "",
-          quantity: item.quantity || 1,
-        }));
+        const backendItems: CartItem[] = (data.items || []).map((item: any) =>
+          normalizeProduct({
+            ...item,
+            quantity: item.quantity || 1,
+            selectedSize: item.selectedSize || "",
+          })
+        );
 
         setCart(backendItems);
       } catch (err) {
@@ -76,28 +87,27 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   // 2️⃣ Guardar carrito (solo cuando ya está cargado)
   // ---------------------------------------------------------
   useEffect(() => {
-    if (!loaded) return; // evita enviar [] al backend
+    if (!loaded) return;
 
-    // Visitante → NO guardar nada (carrito vacío siempre)
-    if (user === null) return;
-
-    // Usuario → guardar en backend
-    fetch(`${API_URL_SAVE}/${user!.uid}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items: cart }),
-    }).catch(err => console.error("Error saving cart:", err));
+    if (user) {
+      fetch(`${API_URL_SAVE}/${user.uid}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: cart }),
+      }).catch(err => console.error("Error saving cart:", err));
+    }
   }, [cart, user, loaded]);
 
   // ---------------------------------------------------------
   // 3️⃣ Funciones del carrito
   // ---------------------------------------------------------
   const addToCart = (product: ImagePlaceholder, selectedSize = "") =>
-    increaseQuantity(product.id, product, selectedSize);
+    increaseQuantity(product.id, normalizeProduct(product), selectedSize);
 
   const increaseQuantity = (id: string | number, product?: ImagePlaceholder, size = "") => {
     setCart(prev => {
       const existing = prev.find(i => i.id === id && i.selectedSize === size);
+
       if (existing)
         return prev.map(i =>
           i.id === id && i.selectedSize === size
@@ -105,7 +115,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
             : i
         );
 
-      if (product) return [...prev, { ...product, quantity: 1, selectedSize: size }];
+      if (product)
+        return [...prev, normalizeProduct({ ...product, quantity: 1, selectedSize: size })];
+
       return prev;
     });
   };
@@ -131,7 +143,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const clearCart = () => setCart([]);
 
-  const total = cart.reduce((sum, item) => sum + (item.price ? item.price * item.quantity : 0), 0);
+  const total = cart.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0);
 
   return (
     <CartContext.Provider
