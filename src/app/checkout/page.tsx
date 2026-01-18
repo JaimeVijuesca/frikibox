@@ -22,6 +22,15 @@ export default function CheckoutPage() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
+  // Datos del cliente
+  const [address, setAddress] = useState({
+    fullName: "",
+    street: "",
+    city: "",
+    postalCode: "",
+    country: "",
+  });
+
   // Redirigir al inicio si el carrito está vacío
   useEffect(() => {
     if (cart.length === 0) {
@@ -29,14 +38,31 @@ export default function CheckoutPage() {
     }
   }, [cart, router]);
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAddress((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
   const handleCheckout = async () => {
+    // Validar campos
+    if (!address.fullName || !address.street || !address.city || !address.postalCode || !address.country) {
+      toast({
+        title: "Campos incompletos",
+        description: "Por favor, completa todos los campos de dirección",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
-      // Llamamos a nuestro endpoint en NestJS para crear la sesión
+      // Enviar carrito + dirección al backend
       const res = await fetch("http://localhost:3001/payments/payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cart }),
+        body: JSON.stringify({ cart, address }),
       });
 
       if (!res.ok) {
@@ -46,7 +72,6 @@ export default function CheckoutPage() {
 
       const data = await res.json();
 
-      // Redirigir a Stripe Checkout
       if (data.url) {
         window.location.href = data.url;
       } else {
@@ -63,7 +88,6 @@ export default function CheckoutPage() {
     }
   };
 
-  // Mientras se redirige o no hay carrito
   if (cart.length === 0) return null;
 
   return (
@@ -122,11 +146,55 @@ export default function CheckoutPage() {
             <CardHeader>
               <CardTitle>Proceder al Pago</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               <p className="text-muted-foreground">
                 Serás redirigido a la pasarela de pago segura de Stripe para
                 completar tu compra.
               </p>
+
+              {/* Formulario de dirección */}
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  name="fullName"
+                  placeholder="Nombre completo"
+                  value={address.fullName}
+                  onChange={handleInputChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+                <input
+                  type="text"
+                  name="street"
+                  placeholder="Calle y número"
+                  value={address.street}
+                  onChange={handleInputChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+                <input
+                  type="text"
+                  name="city"
+                  placeholder="Ciudad"
+                  value={address.city}
+                  onChange={handleInputChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+                <input
+                  type="text"
+                  name="postalCode"
+                  placeholder="Código postal"
+                  value={address.postalCode}
+                  onChange={handleInputChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+                <input
+                  type="text"
+                  name="country"
+                  placeholder="País"
+                  value={address.country}
+                  onChange={handleInputChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+              </div>
             </CardContent>
             <CardFooter className="flex-col gap-4">
               <Button
