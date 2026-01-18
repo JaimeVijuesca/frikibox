@@ -237,7 +237,7 @@ export default function AdminPage() {
                 </TableCell>
                 <TableCell>{product.name}</TableCell>
                 <TableCell>
-                  {product.price ? `${product.price}€` : "N/A"}
+                  {product.price ? `${product.price}€` : "0€"}
                 </TableCell>
                 <TableCell>{product.category}</TableCell>
                 <TableCell>

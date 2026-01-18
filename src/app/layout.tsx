@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
-import { Toaster } from "../components/ui/toaster"
+import { Toaster } from "../components/ui/toaster";
 import Header from '../components/header';
 import { CartProvider } from '../context/cart-context';
-import './globals.css';
 import { DndProvider } from '../context/dnd-context';
 import { AuthProvider } from '../context/auth-context';
 import { ThemeProvider } from '../context/theme-context';
+import { OrdersProvider } from '../context/order-context';
+import './globals.css';
 
 export const metadata: Metadata = {
   title: 'FrikiBox',
@@ -22,20 +23,25 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&family=Belleza&display=swap" rel="stylesheet" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&family=Belleza&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body className="font-body antialiased">
         <ThemeProvider>
           <AuthProvider>
             <DndProvider>
               <CartProvider>
-                <div className="flex flex-col min-h-screen">
-                  <Header />
-                  <main className="flex-1">
-                    {children}
-                  </main>
-                </div>
-                <Toaster />
+                <OrdersProvider>
+                  <div className="flex flex-col min-h-screen">
+                    <Header />
+                    <main className="flex-1">
+                      {children}
+                    </main>
+                  </div>
+                  <Toaster />
+                </OrdersProvider>
               </CartProvider>
             </DndProvider>
           </AuthProvider>

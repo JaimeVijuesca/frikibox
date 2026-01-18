@@ -196,7 +196,7 @@ function ProductCard({ product, handleAddToCart }: { product: any, handleAddToCa
           <CardTitle className="text-lg transition-colors group-hover:text-primary">{product.name}</CardTitle>
         </CardHeader>
         <CardFooter className="flex justify-between items-center mt-auto pt-4">
-          <span className="text-xl font-bold">{product.price ? `${product.price?.toFixed(2)}€` : `Desde ${product.variants?.[0]?.price?.toFixed(2)}€`}</span>
+          <span className="text-lg font-bold">{product.price ? `${product.price.toFixed(2)}€` : '0.00€'}</span>
           <Button onClick={(e) => handleAddToCart(e, product)}>
             <ShoppingCart className="mr-2 h-4 w-4" />
             {getButtonText(product)}
