@@ -1,118 +1,152 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { type ImagePlaceholder } from "../lib/placeholder-images";
 import { useAuth } from "./auth-context";
+import { type ImagePlaceholder } from "../lib/placeholder-images";
 
 interface CartItem extends ImagePlaceholder {
   quantity: number;
-  selectedSize: string; // siempre una cadena
+  selectedSize: string;
 }
 
 interface CartContextType {
   cart: CartItem[];
   addToCart: (product: ImagePlaceholder, selectedSize?: string) => void;
-  increaseQuantity: (productId: string | number, product?: ImagePlaceholder, selectedSize?: string) => void;
-  decreaseQuantity: (productId: string | number, selectedSize?: string) => void;
-  removeItem: (productId: string | number, selectedSize?: string) => void;
+  increaseQuantity: (id: string | number, product?: ImagePlaceholder, size?: string) => void;
+  decreaseQuantity: (id: string | number, size?: string) => void;
+  removeItem: (id: string | number, size?: string) => void;
   clearCart: () => void;
   total: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
-const API_URL = "http://localhost:3001/cart";
+
+// 🔧 SOLO CAMBIA ESTAS DOS URLS
+const API_URL_GET = "http://localhost:3001/cart";   // GET /:uid
+const API_URL_SAVE = "http://localhost:3001/cart";  // POST /:uid
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
+
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [loaded, setLoaded] = useState(false); // evita guardar antes de cargar
 
-  // ---------- Cargar carrito desde backend ----------
-  const loadCart = async () => {
-    if (!user?.uid) return;
+  // ---------------------------------------------------------
+  // 1️⃣ Cargar carrito al iniciar (visitante o usuario)
+  // ---------------------------------------------------------
+  useEffect(() => {
+    const loadGuestCart = () => {
+      const saved = localStorage.getItem("cart");
+      setCart(saved ? JSON.parse(saved) : []);
+      setLoaded(true);
+    };
 
-    try {
-      const res = await fetch(`${API_URL}/${user.uid}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
-      if (!res.ok) throw new Error("Error fetching cart");
+    const loadUserCart = async () => {
+      try {
+        const res = await fetch(`${API_URL_GET}/${user!.uid}`);
+        const data = await res.json();
 
-      const data = await res.json();
+        const backendItems: CartItem[] = (data.items || []).map((item: any) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          imageUrl: item.imageUrl,
+          selectedSize: item.selectedSize || "",
+          quantity: item.quantity || 1,
+        }));
 
-      // Normalizamos los datos: selectedSize siempre string, quantity >= 1
-      const normalized = (data.items || []).map((item: any) => ({
-        id: item.id,
-        name: item.name,
-        price: item.price,
-        imageUrl: item.imageUrl,
-        selectedSize: item.selectedSize || "",
-        quantity: item.quantity || 1,
-      }));
+        setCart(backendItems);
+      } catch (err) {
+        console.error("Error loading cart:", err);
+        setCart([]);
+      } finally {
+        setLoaded(true);
+      }
+    };
 
-      setCart(normalized);
-    } catch (error) {
-      console.error("Load cart error:", error);
+    // Esperar a que Firebase termine de cargar
+    if (user === undefined) return;
+
+    if (user === null) loadGuestCart();
+    else loadUserCart();
+  }, [user]);
+
+  // ---------------------------------------------------------
+  // 2️⃣ Guardar carrito (solo cuando ya está cargado)
+  // ---------------------------------------------------------
+  useEffect(() => {
+    if (!loaded) return; // evita enviar [] al backend
+
+    if (user === null) {
+      // Visitante → localStorage
+      localStorage.setItem("cart", JSON.stringify(cart));
     }
-  };
 
-  // ---------- Guardar carrito en backend ----------
-  const saveCartToAPI = async (items: CartItem[]) => {
-    if (!user?.uid) return;
-    try {
-      await fetch(`${API_URL}/${user.uid}`, {
+    if (user) {
+      // Usuario → backend
+      fetch(`${API_URL_SAVE}/${user.uid}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items }),
-      });
-    } catch (error) {
-      console.error("Save cart error:", error);
+        body: JSON.stringify({ items: cart }),
+      }).catch(err => console.error("Error saving cart:", err));
     }
-  };
+  }, [cart, user, loaded]);
 
-  // ---------- Efectos ----------
-  useEffect(() => { loadCart(); }, [user?.uid]);
-  useEffect(() => { if (user?.uid) saveCartToAPI(cart); }, [cart, user?.uid]);
-
-  // ---------- Funciones del carrito ----------
-  const addToCart = (product: ImagePlaceholder, selectedSize?: string) => {
+  // ---------------------------------------------------------
+  // 3️⃣ Funciones del carrito
+  // ---------------------------------------------------------
+  const addToCart = (product: ImagePlaceholder, selectedSize = "") =>
     increaseQuantity(product.id, product, selectedSize);
-  };
 
-  const increaseQuantity = (productId: string | number, product?: ImagePlaceholder, selectedSize = "") => {
+  const increaseQuantity = (id: string | number, product?: ImagePlaceholder, size = "") => {
     setCart(prev => {
-      const existing = prev.find(i => i.id === productId && i.selectedSize === selectedSize);
-      if (existing) return prev.map(i => i.id === productId && i.selectedSize === selectedSize ? { ...i, quantity: i.quantity + 1 } : i);
-      if (product) return [...prev, { ...product, quantity: 1, selectedSize }];
+      const existing = prev.find(i => i.id === id && i.selectedSize === size);
+      if (existing)
+        return prev.map(i =>
+          i.id === id && i.selectedSize === size
+            ? { ...i, quantity: i.quantity + 1 }
+            : i
+        );
+
+      if (product) return [...prev, { ...product, quantity: 1, selectedSize: size }];
       return prev;
     });
   };
 
-  const decreaseQuantity = (productId: string | number, selectedSize = "") => {
+  const decreaseQuantity = (id: string | number, size = "") => {
     setCart(prev => {
-      const existing = prev.find(i => i.id === productId && i.selectedSize === selectedSize);
+      const existing = prev.find(i => i.id === id && i.selectedSize === size);
       if (!existing) return prev;
-      if (existing.quantity > 1) return prev.map(i => i.id === productId && i.selectedSize === selectedSize ? { ...i, quantity: i.quantity - 1 } : i);
-      return prev.filter(i => !(i.id === productId && i.selectedSize === selectedSize));
+
+      if (existing.quantity > 1)
+        return prev.map(i =>
+          i.id === id && i.selectedSize === size
+            ? { ...i, quantity: i.quantity - 1 }
+            : i
+        );
+
+      return prev.filter(i => !(i.id === id && i.selectedSize === size));
     });
   };
 
-  const removeItem = (productId: string | number, selectedSize = "") => {
-    setCart(prev => prev.filter(i => !(i.id === productId && i.selectedSize === selectedSize)));
-  };
+  const removeItem = (id: string | number, size = "") =>
+    setCart(prev => prev.filter(i => !(i.id === id && i.selectedSize === size)));
 
   const clearCart = () => setCart([]);
 
-  const total = cart.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0);
+  const total = cart.reduce((sum, item) => sum + (item.price ? item.price * item.quantity : 0), 0);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, increaseQuantity, decreaseQuantity, removeItem, clearCart, total }}>
+    <CartContext.Provider
+      value={{ cart, addToCart, increaseQuantity, decreaseQuantity, removeItem, clearCart, total }}
+    >
       {children}
     </CartContext.Provider>
   );
 };
 
 export const useCart = () => {
-  const context = useContext(CartContext);
-  if (!context) throw new Error("useCart must be used within a CartProvider");
-  return context;
+  const ctx = useContext(CartContext);
+  if (!ctx) throw new Error("useCart must be used inside CartProvider");
+  return ctx;
 };

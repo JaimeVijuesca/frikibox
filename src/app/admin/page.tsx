@@ -262,6 +262,152 @@ export default function AdminPage() {
               onSubmit={handleAddProduct}
               className="bg-white p-6 rounded-md w-full max-w-lg space-y-4 overflow-y-auto max-h-[90vh]"
             >
+              <h2 className="text-xl font-bold mb-4">Añadir Nuevo Producto</h2>
+
+              <div className="space-y-2">
+                <label className="block font-medium">Nombre</label>
+                <input
+                  type="text"
+                  value={newProduct.name}
+                  onChange={(e) =>
+                    setNewProduct((prev) => ({ ...prev, name: e.target.value }))
+                  }
+                  required
+                  className="w-full border px-3 py-2 rounded-md"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block font-medium">Descripción</label>
+                <textarea
+                  value={newProduct.description}
+                  onChange={(e) =>
+                    setNewProduct((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
+                  className="w-full border px-3 py-2 rounded-md"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block font-medium">Precio (€)</label>
+                <input
+                  type="number"
+                  value={newProduct.price}
+                  onChange={(e) =>
+                    setNewProduct((prev) => ({
+                      ...prev,
+                      price: parseFloat(e.target.value),
+                    }))
+                  }
+                  required
+                  className="w-full border px-3 py-2 rounded-md"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block font-medium">Categoría</label>
+                <select
+                  value={newProduct.category}
+                  onChange={(e) =>
+                    setNewProduct((prev) => ({
+                      ...prev,
+                      category: e.target.value,
+                    }))
+                  }
+                  className="w-full border px-3 py-2 rounded-md"
+                >
+                  <option value="clothing">Ropa</option>
+                  <option value="accessories">Accesorios</option>
+                  <option value="figures">Figuras</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block font-medium">Tallas Disponibles</label>
+                <div className="flex flex-wrap gap-2">
+                  {sizeOptions.map((size) => (
+                    <button
+                      type="button"
+                      key={size}
+                      onClick={() => handleSizeToggle(size)}
+                      className={`px-3 py-1 border rounded-md ${
+                        newProduct.availableSizes.includes(size)
+                          ? "bg-blue-500 text-white border-blue-500"
+                          : "bg-white text-gray-700"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block font-medium">Imagen Principal</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    setNewProduct((prev) => ({
+                      ...prev,
+                      imageUrl: e.target.files ? e.target.files[0] : null,
+                    }))
+                  }
+                  required
+                  className="w-full"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block font-medium">
+                  Imagen Trasera (Opcional)
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    setNewProduct((prev) => ({
+                      ...prev,
+                      imageUrlBack: e.target.files ? e.target.files[0] : null,
+                    }))
+                  }
+                  className="w-full"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block font-medium">
+                  Etiquetas (separadas por comas)
+                </label>
+                <input
+                  type="text"
+                  value={newProduct.tag.join(", ")}
+                  onChange={(e) =>
+                    setNewProduct((prev) => ({
+                      ...prev,
+                      tag: e.target.value.split(",").map((t) => t.trim()),
+                    }))
+                  }
+                  className="w-full border px-3 py-2 rounded-md"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 mt-4">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setModalOpen(false)}
+                  disabled={loadingAction}
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit" disabled={loadingAction}>
+                  {loadingAction ? "Guardando..." : "Guardar Producto"}
+                </Button>
+              </div>
               {/* ... Aquí va el formulario exactamente igual que antes ... */}
             </form>
           </div>
