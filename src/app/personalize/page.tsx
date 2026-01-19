@@ -302,7 +302,7 @@ export default function PersonalizePage() {
       try {
         setProductsLoading(true);
 
-        const res = await fetch(`https://frikibox-backend.vercel.app//products/all`);
+        const res = await fetch(`https://frikibox-backend.vercel.app/products/all`);
 
         if (!res.ok) {
           throw new Error("Error al cargar productos");
