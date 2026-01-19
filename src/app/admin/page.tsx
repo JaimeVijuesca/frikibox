@@ -57,7 +57,7 @@ export default function AdminPage() {
   const fetchProducts = async () => {
     setProductsLoading(true);
     try {
-      const res = await fetch("http://localhost:3001/products/all");
+      const res = await fetch("https://frikibox-backend.vercel.app/products/all");
       if (!res.ok) throw new Error("Error al cargar productos");
       const data = await res.json();
       setProducts(data);
@@ -77,7 +77,7 @@ export default function AdminPage() {
     const fetchProducts = async () => {
       setProductsLoading(true);
       try {
-        const res = await fetch("http://localhost:3001/products/all");
+        const res = await fetch("https://frikibox-backend.vercel.app/products/all");
         if (!res.ok) throw new Error("Error al cargar productos");
         const data = await res.json();
         setProducts(data);
