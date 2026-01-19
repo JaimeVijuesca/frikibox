@@ -134,7 +134,7 @@ export default function AdminPage() {
       if (newProduct.imageUrlBack)
         formData.append("imageUrlBack", newProduct.imageUrlBack);
 
-      const res = await fetch("https://frikibox-backend.vercel.app/products/create", {
+      const res = await fetch("/products/create", {
         method: "POST",
         body: formData,
       });
