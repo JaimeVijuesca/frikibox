@@ -14,6 +14,15 @@ const nextConfig: NextConfig = {
   images: {
     domains: ["blmmnyiwnqtpsurlfdrw.supabase.co"],
   },
+  // AÑADE ESTA SECCIÓN:
+  async rewrites() {
+    return [
+      {
+        source: "/api-backend/:path*",
+        destination: "https://frikibox-backend.vercel.app/:path*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
