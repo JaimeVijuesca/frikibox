@@ -19,7 +19,7 @@ export default function SuccessPage() {
 
     console.log("Stripe sessionId:", sessionId);
 
-    fetch(`http://localhost:3001/checkout-session?sessionId=${sessionId}`)
+    fetch(`https://frikibox-backend.vercel.app/checkout-session?sessionId=${sessionId}`)
       .then((res) => res.json())
       .then((data) => {
         setOrder(data);

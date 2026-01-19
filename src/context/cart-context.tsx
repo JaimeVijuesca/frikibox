@@ -22,8 +22,8 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 // 🔧 SOLO CAMBIA ESTAS DOS URLS
-const API_URL_GET = "http://localhost:3001/cart";
-const API_URL_SAVE = "http://localhost:3001/cart";
+const API_URL_GET = "https://frikibox-backend.vercel.app/cart";
+const API_URL_SAVE = "https://frikibox-backend.vercel.app/cart";
 
 // 🔥 Normaliza el producto para asegurar que SIEMPRE tenga imageUrl
 const normalizeProduct = (p: any): CartItem => ({

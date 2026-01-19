@@ -173,7 +173,7 @@ export default function AdminPage() {
 
   const handleDeleteProduct = async (id: string | number) => {
     try {
-      const res = await fetch(`http://localhost:3001/products/${id}`, {
+      const res = await fetch(`https://frikibox-backend.vercel.app/products/${id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Error eliminando producto");

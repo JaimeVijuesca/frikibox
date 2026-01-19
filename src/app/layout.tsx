@@ -5,7 +5,7 @@ import { CartProvider } from '../context/cart-context';
 import { DndProvider } from '../context/dnd-context';
 import { AuthProvider } from '../context/auth-context';
 import { ThemeProvider } from '../context/theme-context';
-import { OrdersProvider } from '../context/order-context';
+import { OrderProvider } from '../context/order-context';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -33,7 +33,7 @@ export default function RootLayout({
           <AuthProvider>
             <DndProvider>
               <CartProvider>
-                <OrdersProvider>
+                <OrderProvider>
                   <div className="flex flex-col min-h-screen">
                     <Header />
                     <main className="flex-1">
@@ -41,7 +41,7 @@ export default function RootLayout({
                     </main>
                   </div>
                   <Toaster />
-                </OrdersProvider>
+                </OrderProvider>
               </CartProvider>
             </DndProvider>
           </AuthProvider>

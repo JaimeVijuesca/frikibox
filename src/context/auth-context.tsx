@@ -24,7 +24,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null | undefined>(undefined); // 👈 antes era null
   const [loading, setLoading] = useState(true);
-  const API_URL = 'http://localhost:3001';
+  const API_URL = 'https://frikibox-backend.vercel.app/';
 
   useEffect(() => {
     const storedUser = localStorage.getItem(STORAGE_KEY);

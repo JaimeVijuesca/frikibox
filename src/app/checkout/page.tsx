@@ -1,6 +1,7 @@
 "use client";
 
 import { useCart } from "../../context/cart-context";
+import { useAuth } from "../../context/auth-context";
 import { Button } from "../../components/ui/button";
 import {
   Card,
@@ -17,7 +18,8 @@ import { Lock } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function CheckoutPage() {
-  const { cart, total, clearCart } = useCart();
+  const { cart, total } = useCart();
+  const { user } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -31,12 +33,12 @@ export default function CheckoutPage() {
     country: "",
   });
 
-  // Redirigir al inicio si el carrito está vacío
+  // Redirigir al inicio si el carrito está vacío o usuario no autenticado
   useEffect(() => {
-    if (cart.length === 0) {
+    if (!user?.uid || cart.length === 0) {
       router.push("/");
     }
-  }, [cart, router]);
+  }, [cart, user, router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAddress((prev) => ({
@@ -56,13 +58,22 @@ export default function CheckoutPage() {
       return;
     }
 
+    if (!user?.uid) {
+      toast({
+        title: "Usuario no autenticado",
+        description: "Debes iniciar sesión para completar la compra",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
-      // Enviar carrito + dirección al backend
-      const res = await fetch("http://localhost:3001/payments/payment", {
+      // Enviar carrito + dirección + UID al backend
+      const res = await fetch("https://frikibox-backend.vercel.app//payments/payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cart, address }),
+        body: JSON.stringify({ cart, address, uid: user.uid }),
       });
 
       if (!res.ok) {
@@ -88,7 +99,7 @@ export default function CheckoutPage() {
     }
   };
 
-  if (cart.length === 0) return null;
+  if (!user?.uid || cart.length === 0) return null;
 
   return (
     <section className="py-12 md:py-24">

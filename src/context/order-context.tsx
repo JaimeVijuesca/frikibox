@@ -1,51 +1,77 @@
-"use client";
+"use client"; // <- Esta línea debe ir al inicio del archivo
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { useAuth } from "./auth-context";
 
-interface OrderContextType {
-  orders: any[];
-  addOrder: (order: any) => void;
-  clearOrders: () => void;
+interface CartItem {
+  id: number | string;
+  name: string;
+  quantity: number;
+  price: number;
+  imageUrl: string;
+  selectedSize?: string;
 }
 
-const OrderContext = createContext<OrderContextType | undefined>(undefined);
+interface Order {
+  id: number | string;
+  date: string;
+  status: string;
+  paymentMethod: string;
+  cart: CartItem[];
+  total?: number;
+  items: CartItem[];
+}
 
-export function OrdersProvider({ children }: { children: ReactNode }) {
-  const [orders, setOrders] = useState<any[]>([]);
+interface OrderContextType {
+  orders: Order[];
+  refreshOrders: () => Promise<void>;
+}
 
-  // Cargar pedidos desde localStorage al iniciar
-  useEffect(() => {
-    const stored = localStorage.getItem("orders");
-    if (stored) {
-      setOrders(JSON.parse(stored));
+const OrderContext = createContext<OrderContextType>({
+  orders: [],
+  refreshOrders: async () => {},
+});
+
+export function OrderProvider({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  const [orders, setOrders] = useState<Order[]>([]);
+
+  const fetchOrders = async () => {
+    if (!user?.uid) return; // solo si hay usuario
+    try {
+      const res = await fetch(
+        `https://frikibox-backend.vercel.app/orders/my-orders?userId=${user.uid}`
+      );
+
+      const data = await res.json();
+
+      const dataArray: Order[] = Array.isArray(data) ? data : data.orders ?? [];
+
+      const ordersWithTotals = dataArray.map((order) => ({
+        ...order,
+        items: order.cart ?? [],
+        total:
+          order.cart?.reduce(
+            (sum, item) => sum + (item.price ?? 0) * (item.quantity ?? 1),
+            0
+          ) ?? 0,
+      }));
+
+      setOrders(ordersWithTotals);
+    } catch (err) {
+      console.error("Error fetching orders:", err);
     }
-  }, []);
+  };
 
-  // Guardar pedidos en localStorage cuando cambien
   useEffect(() => {
-    localStorage.setItem("orders", JSON.stringify(orders));
-  }, [orders]);
-
-  const addOrder = (order: any) => {
-    setOrders(prev => [order, ...prev]);
-  };
-
-  const clearOrders = () => {
-    setOrders([]);
-    localStorage.removeItem("orders");
-  };
+    fetchOrders();
+  }, [user]);
 
   return (
-    <OrderContext.Provider value={{ orders, addOrder, clearOrders }}>
+    <OrderContext.Provider value={{ orders, refreshOrders: fetchOrders }}>
       {children}
     </OrderContext.Provider>
   );
 }
 
-export function useOrders() {
-  const context = useContext(OrderContext);
-  if (!context) {
-    throw new Error("useOrders debe usarse dentro de OrdersProvider");
-  }
-  return context;
-}
+export const useOrders = () => useContext(OrderContext);

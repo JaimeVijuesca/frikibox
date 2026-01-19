@@ -67,7 +67,7 @@ export default function ProductDetailPage() {
       setLoading(true);
       try {
         console.log("id " + id);
-        const res = await fetch(`http://localhost:3001/products/${id}`); // Endpoint de tu backend
+        const res = await fetch(`https://frikibox-backend.vercel.app/products/${id}`); // Endpoint de tu backend
         if (!res.ok) throw new Error("Producto no encontrado");
         const data: Product = await res.json();
         setProduct(data);

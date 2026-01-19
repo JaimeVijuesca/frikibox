@@ -27,7 +27,7 @@ export default function ProductsPage() {
     const fetchProducts = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch('http://localhost:3001/products/all'); // tu endpoint
+        const res = await fetch('https://frikibox-backend.vercel.app/products/all'); // tu endpoint
         if (!res.ok) throw new Error('Error al cargar productos');
         const data = await res.json();
         setProducts(data);
