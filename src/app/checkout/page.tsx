@@ -70,7 +70,7 @@ export default function CheckoutPage() {
     setLoading(true);
     try {
       // Enviar carrito + dirección + UID al backend
-      const res = await fetch("https://frikibox-backend.vercel.app//payments/payment", {
+      const res = await fetch("https://frikibox-backend.vercel.app/payments/payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cart, address, uid: user.uid }),
