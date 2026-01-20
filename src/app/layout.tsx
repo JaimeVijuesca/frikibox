@@ -1,16 +1,17 @@
-import type { Metadata } from 'next';
+import type { Metadata } from "next";
 import { Toaster } from "../components/ui/toaster";
-import Header from '../components/header';
-import { CartProvider } from '../context/cart-context';
-import { DndProvider } from '../context/dnd-context';
-import { AuthProvider } from '../context/auth-context';
-import { ThemeProvider } from '../context/theme-context';
-import { OrderProvider } from '../context/order-context';
-import './globals.css';
+import Header from "../components/header";
+import { CartProvider } from "../context/cart-context";
+import { DndProvider } from "../context/dnd-context";
+import { AuthProvider } from "../context/auth-context";
+import { ThemeProvider } from "../context/theme-context";
+import { OrderProvider } from "../context/order-context";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: 'FrikiBox',
-  description: 'Tu caja friki personalizada: Funko Pop, camisetas y accesorios de tus videojuegos, series y cómics favoritos.',
+  title: "FrikiBox",
+  description:
+    "Tu caja friki personalizada: Funko Pop, camisetas y accesorios de tus videojuegos, series y cómics favoritos.",
 };
 
 export default function RootLayout({
@@ -22,10 +23,19 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
         <link
           href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&family=Belleza&display=swap"
           rel="stylesheet"
+        />
+        <script
+          defer
+          src="https://cloud.umami.is/script.js"
+          data-website-id="6b641f1c-c148-40be-9583-7fa9d05e7f92"
         />
       </head>
       <body className="font-body antialiased">
@@ -36,9 +46,7 @@ export default function RootLayout({
                 <OrderProvider>
                   <div className="flex flex-col min-h-screen">
                     <Header />
-                    <main className="flex-1">
-                      {children}
-                    </main>
+                    <main className="flex-1">{children}</main>
                   </div>
                   <Toaster />
                 </OrderProvider>
