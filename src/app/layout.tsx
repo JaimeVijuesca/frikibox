@@ -9,7 +9,7 @@ import { OrderProvider } from "../context/order-context";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "FrikiBox",
+  title: "FrikiBox | Cajas Frikis Personalizadas y Regalos Geek",
   description:
     "Tu caja friki personalizada: Funko Pop, camisetas y accesorios de tus videojuegos, series y cómics favoritos.",
 };

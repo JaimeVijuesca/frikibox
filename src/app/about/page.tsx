@@ -5,6 +5,13 @@ import { Button } from '../../components/ui/button';
 import { InstagramIcon, TiktokIcon } from '../../components/icons';
 import { Mail } from 'lucide-react';
 
+export const metadata = {
+  title: "Sobre Frikibox | Proyecto Friki y Cajas Geek",
+  description:
+    "Conoce Frikibox, un proyecto dedicado a crear cajas frikis personalizadas para amantes del anime, gaming y la cultura geek.",
+};
+
+
 export default function AboutPage() {
   const founderImage = PlaceHolderImages.find((img) => img.id === 'founder-photo');
 

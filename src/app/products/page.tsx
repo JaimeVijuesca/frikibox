@@ -12,6 +12,8 @@ import { useCart } from '../../context/cart-context';
 import { useToast } from "../../hooks/use-toast";
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '../../components/ui/skeleton';
+import type { Metadata } from "next";
+
 
 export default function ProductsPage() {
   const { addToCart } = useCart();
@@ -21,6 +23,11 @@ export default function ProductsPage() {
   const [selectedFranchise, setSelectedFranchise] = useState<string>('all');
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const metadata: Metadata = {
+  title: "Productos Frikis y Regalos Geek",
+  description: "Descubre productos frikis: figuras, merchandising y regalos geek.",
+};
 
   // --- Fetch productos desde la API ---
   useEffect(() => {
