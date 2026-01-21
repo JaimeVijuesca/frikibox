@@ -134,7 +134,7 @@ export default function AdminPage() {
       if (newProduct.imageUrlBack)
         formData.append("imageUrlBack", newProduct.imageUrlBack);
 
-      const res = await fetch("/products/create", {
+      const res = await fetch("http://localhost:3001/products/create", {
         method: "POST",
         body: formData,
       });
