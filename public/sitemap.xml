@@ -10,21 +10,21 @@
 
   <!-- Páginas fijas -->
   <url>
-    <loc>https://frikibox.vercel.app/productos</loc>
+    <loc>https://frikibox.vercel.app/products</loc>
     <lastmod>2026-01-21T00:00:00Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://frikibox.vercel.app/crea-tu-frikibox</loc>
+    <loc>https://frikibox.vercel.app/personalize</loc>
     <lastmod>2026-01-21T00:00:00Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://frikibox.vercel.app/sobre-mi</loc>
+    <loc>https://frikibox.vercel.app/about</loc>
     <lastmod>2026-01-21T00:00:00Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
