@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Página principal -->
+  <url>
+    <loc>https://frikibox.vercel.app/</loc>
+    <lastmod>2026-01-21T00:00:00Z</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Páginas fijas -->
+  <url>
+    <loc>https://frikibox.vercel.app/productos</loc>
+    <lastmod>2026-01-21T00:00:00Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://frikibox.vercel.app/crea-tu-frikibox</loc>
+    <lastmod>2026-01-21T00:00:00Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://frikibox.vercel.app/sobre-mi</loc>
+    <lastmod>2026-01-21T00:00:00Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+</urlset>
