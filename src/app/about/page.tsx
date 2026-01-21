@@ -4,8 +4,9 @@ import { PlaceHolderImages } from '../../lib/placeholder-images';
 import { Button } from '../../components/ui/button';
 import { InstagramIcon, TiktokIcon } from '../../components/icons';
 import { Mail } from 'lucide-react';
+import { Metadata } from 'next';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Sobre Frikibox | Proyecto Friki y Cajas Geek",
   description:
     "Conoce Frikibox, un proyecto dedicado a crear cajas frikis personalizadas para amantes del anime, gaming y la cultura geek.",

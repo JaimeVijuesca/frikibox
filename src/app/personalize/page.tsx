@@ -44,9 +44,10 @@ import {
 } from "../../components/ui/select";
 import { ScrollArea, ScrollBar } from "../../components/ui/scroll-area";
 import { Skeleton } from "../../components/ui/skeleton";
+import type { Metadata } from "next";
 
 
-export const metadata = {
+  export const metadata: Metadata = {
   title: "Crea tu Frikibox | Caja Friki Personalizada a tu Gusto",
   description:
     "Diseña tu Frikibox personalizada con productos frikis de anime, gaming, cine y cultura geek. Elige lo que te gusta y crea tu caja perfecta.",
