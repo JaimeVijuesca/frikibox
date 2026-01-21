@@ -21,16 +21,70 @@ export default function ThemedBoxes() {
     setIsLoading(false);
   }, []);
 
-  if (isLoading) {
-    return (
-      <section id="themed-boxes" className="py-12 md:py-24 lg:py-32 bg-card">
-        <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-            <Skeleton className="h-10 w-1/2" />
-            <Skeleton className="h-6 w-3/4" />
-          </div>
-          <div className="grid grid-cols-1 justify-center">
-            <Card className="overflow-hidden rounded-lg shadow-lg max-w-sm mx-auto">
+  if (isLoading) return <ThemedBoxesSkeleton />;
+
+  if (!themedBox) return null;
+
+  const startingPrice = themedBox.variants?.reduce((min, v) => (v.price < min ? v.price : min), themedBox.variants[0].price);
+
+  return (
+    <section id="themed-boxes" className="py-16 md:py-24 lg:py-32 bg-card">
+      <div className="container px-4 md:px-6">
+        {/* Header */}
+        <div className="flex flex-col items-center text-center mb-12 space-y-2">
+          <h2 className="text-3xl sm:text-5xl font-headline font-bold animate-fade-in-down">
+            Nuestras Cajas Temáticas
+          </h2>
+          <p className="max-w-2xl text-muted-foreground md:text-xl animate-fade-in-up">
+            Elige tu tema favorito y déjate sorprender con tu FrikiBox personalizada.
+          </p>
+        </div>
+
+        {/* Boxes */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-center animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+          <Link href={`/product/${themedBox.id}`} passHref>
+            <Card className="group overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col h-full max-w-sm mx-auto">
+              <CardContent className="relative aspect-square p-0">
+                <Image
+                  src={themedBox.imageUrl}
+                  alt={`Caja temática ${themedBox.name}`}
+                  fill
+                  className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+                  data-ai-hint={themedBox.imageHint}
+                />
+              </CardContent>
+              <CardHeader>
+                <CardTitle className="text-lg font-bold">{themedBox.name}</CardTitle>
+              </CardHeader>
+              <CardFooter className="flex justify-between items-center mt-auto pt-4">
+                {startingPrice && (
+                  <span className="text-xl font-bold text-primary">Desde {startingPrice.toFixed(2)}€</span>
+                )}
+                <Button className="flex items-center gap-2 bg-accent text-accent-foreground hover:bg-accent/90 transition-transform duration-300 ease-in-out hover:scale-105">
+                  <Package className="h-4 w-4" />
+                  Ver Opciones
+                </Button>
+              </CardFooter>
+            </Card>
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Skeleton separado para limpieza
+function ThemedBoxesSkeleton() {
+  return (
+    <section id="themed-boxes" className="py-12 md:py-24 lg:py-32 bg-card">
+      <div className="container px-4 md:px-6">
+        <div className="flex flex-col items-center text-center mb-12 space-y-4">
+          <Skeleton className="h-10 w-1/2" />
+          <Skeleton className="h-6 w-3/4" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i} className="overflow-hidden rounded-xl shadow-lg max-w-sm mx-auto">
               <CardContent className="p-0 relative aspect-square">
                 <Skeleton className="w-full h-full" />
               </CardContent>
@@ -42,51 +96,7 @@ export default function ThemedBoxes() {
                 <Skeleton className="h-10 w-1/3" />
               </CardFooter>
             </Card>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (!themedBox) return null;
-
-  const startingPrice = themedBox.variants?.reduce((min, v) => v.price < min ? v.price : min, themedBox.variants[0].price);
-
-  return (
-    <section id="themed-boxes" className="py-12 md:py-24 lg:py-32 bg-card">
-      <div className="container px-4 md:px-6">
-        <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-          <div className="space-y-2">
-            <h2 className="text-3xl font-headline font-bold tracking-tighter sm:text-5xl animate-fade-in-down">Nuestras Cajas Temáticas</h2>
-            <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed animate-fade-in-up">
-              Elige tu tema favorito y déjate sorprender.
-            </p>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-center animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            <Link href={`/product/${themedBox.id}`} passHref>
-              <Card className="overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col h-full group max-w-sm mx-auto">
-                <CardContent className="p-0 relative aspect-square">
-                  <Image
-                    src={themedBox.imageUrl}
-                    alt={themedBox.name}
-                    fill
-                    className="object-cover w-full h-full transition-all duration-500 group-hover:scale-105"
-                    data-ai-hint={themedBox.imageHint}
-                  />
-                </CardContent>
-                <CardHeader>
-                  <CardTitle className="text-lg">{themedBox.name}</CardTitle>
-                </CardHeader>
-                <CardFooter className="flex justify-between items-center mt-auto pt-4">
-                  {startingPrice && <span className="text-xl font-bold">Desde {startingPrice.toFixed(2)}€</span>}
-                  <Button>
-                    <Package className="mr-2 h-4 w-4" />
-                    Ver Opciones
-                  </Button>
-                </CardFooter>
-              </Card>
-            </Link>
+          ))}
         </div>
       </div>
     </section>

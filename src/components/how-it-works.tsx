@@ -14,13 +14,13 @@ const steps = [
     ),
     title: '1️⃣ Elige tu temática favorita',
     description:
-      'Navega entre videojuegos, series, películas o cómics y encuentra lo que más te apasiona para tu FrikiBox personalizada.',
+      'Selecciona entre videojuegos, series, películas o cómics para tu caja friki personalizada y empieza a crear tu FrikiBox única.',
   },
   {
     icon: <CheckCircle className="w-8 h-8 text-primary" role="img" aria-label="Personalización de caja" />,
     title: '2️⃣ Personaliza tu FrikiBox',
     description:
-      'Selecciona Funko Pop, camisetas y accesorios únicos. Crea una caja a tu medida para ti o para regalar a un fan de la cultura geek.',
+      'Agrega Funko Pop, camisetas y accesorios geek a tu caja. Personaliza cada detalle y crea un regalo perfecto o tu propio tesoro geek.',
   },
   {
     icon: (
@@ -47,34 +47,37 @@ const steps = [
     ),
     title: '3️⃣ Recíbela y sorprende',
     description:
-      'Tu FrikiBox llegará a tu casa, perfectamente empaquetada y lista para regalar o disfrutar por ti mismo.',
+      'Tu FrikiBox llegará a tu puerta, empaquetada y lista para regalar o disfrutar. La manera más fácil de sorprender a cualquier fan geek.',
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="bg-card py-16 flex justify-center">
+    <section id="how-it-works" className="bg-card py-20 flex justify-center">
       <div className="container px-4 md:px-6 flex flex-col items-center text-center">
         {/* Encabezado */}
-        <div className="mb-12">
-          <h2 className="text-3xl font-headline font-bold sm:text-5xl animate-fade-in-down">
-            ¿Cómo funciona FrikiBox?
+        <div className="mb-16 max-w-3xl">
+          <h2 className="text-3xl sm:text-5xl font-headline font-bold animate-fade-in-down">
+            ¿Cómo crear tu FrikiBox?
           </h2>
-          <p className="max-w-2xl text-muted-foreground mt-4 text-lg animate-fade-in-up">
-            En solo tres pasos, crea tu caja friki personalizada con tus productos favoritos de anime, cine, videojuegos y cómics.
+          <p className="text-primary font-medium mt-2 animate-fade-in-down">
+            🎁 Tres pasos sencillos para obtener tu caja friki personalizada
+          </p>
+          <p className="mt-4 text-lg text-muted-foreground animate-fade-in-up">
+            Elige tus productos favoritos, personaliza cada detalle y recibe tu FrikiBox lista para regalar o disfrutar por ti mismo.
           </p>
         </div>
 
         {/* Pasos */}
-        <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-3 lg:gap-12 justify-items-center">
+        <div className="grid gap-10 sm:grid-cols-1 md:grid-cols-3 lg:gap-14 justify-items-center">
           {steps.map((step, index) => (
             <Card
               key={index}
-              className="flex flex-col animate-fade-in-up shadow-lg hover:shadow-xl transition-shadow duration-300 w-full max-w-xs"
-              style={{ animationDelay: `${index * 0.3}s` }}
+              className="flex flex-col animate-fade-in-up shadow-lg hover:shadow-2xl transition-shadow duration-500 w-full max-w-xs"
+              style={{ animationDelay: `${index * 0.25}s` }}
             >
               <CardHeader className="flex flex-col items-center text-center gap-4">
-                <div className="flex items-center justify-center rounded-full bg-primary/10 p-4 text-primary">
+                <div className="flex items-center justify-center rounded-full bg-primary/10 p-5 text-primary">
                   {step.icon}
                 </div>
                 <CardTitle className="font-headline text-xl">{step.title}</CardTitle>
@@ -87,7 +90,7 @@ export default function HowItWorks() {
         </div>
 
         {/* CTA */}
-        <div className="flex justify-center mt-8 animate-fade-in-up" style={{ animationDelay: '0.9s' }}>
+        <div className="flex justify-center mt-12 animate-fade-in-up" style={{ animationDelay: '0.9s' }}>
           <Button
             asChild
             size="lg"
