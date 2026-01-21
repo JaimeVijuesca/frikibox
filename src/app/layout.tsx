@@ -32,6 +32,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&family=Belleza&display=swap"
           rel="stylesheet"
         />
+        <meta name="google-site-verification" content="T1U4A58A9wSHXZA5dEONz58kmdWE0a5ZCMcxm_Cxa7c" />
         <script
           defer
           src="https://cloud.umami.is/script.js"
