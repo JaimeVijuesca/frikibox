@@ -12,17 +12,25 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://frikibox.vercel.app"),
   alternates: {
-    canonical: "/", // Esto genera la etiqueta <link rel="canonical" href="..." />
+    canonical: "/", 
   },
   title: "FrikiBox | Cajas Frikis Personalizadas y Regalos Geek",
   description:
     "Tu caja friki personalizada: Funko Pop, camisetas y accesorios de tus videojuegos, series y cómics favoritos.",
   openGraph: {
     title: "FrikiBox | Cajas Frikis Personalizadas y Regalos Geek",
-    description: "Cajas frikis personalizadas y merchandising oficial.",
+    description: "Cajas frikis personalizadas y merchandising oficial de tus series y videojuegos favoritos.",
     url: "https://frikibox.vercel.app/",
     siteName: "FrikiBox",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png", // Asegúrate de tener una imagen para compartir en redes
+        width: 1200,
+        height: 630,
+        alt: "FrikiBox - Regalos Geek",
+      },
+    ],
   },
 };
 
@@ -31,10 +39,46 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
+  // Esquemas de Schema.org para Google
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "FrikiBox",
+    "url": "https://frikibox.vercel.app",
+    "logo": "https://frikibox.vercel.app/logo.png",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "email": "hola@frikibox.com"
+    }
+  };
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "FrikiBox",
+    "url": "https://frikibox.vercel.app",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://frikibox.vercel.app/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
   return (
     <html lang="es" suppressHydrationWarning> 
-      {/* Cambiado lang="en" a "es" ya que tu web es en español, clave para SEO */}
       <head>
+        {/* Marcado de Datos Estructurados Schema.org */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
+
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -61,11 +105,11 @@ export default function RootLayout({
             <DndProvider>
               <CartProvider>
                 <OrderProvider>
-                  {/* h-full y flex-col aseguran que el footer (si añades uno) se quede abajo y no flote dejando blancos */}
+                  {/* min-h-[100dvh] ayuda a que el layout siempre ocupe la pantalla real sin dejar huecos blancos */}
                   <div className="flex flex-col min-h-[100dvh]">
                     <Header />
-                    {/* Añadimos h-full para que el contenido principal siempre intente llenar el espacio */}
-                    <main className="flex-1 w-full h-full overflow-x-hidden">
+                    {/* flex-1 asegura que el contenido empuje hacia abajo si es poco */}
+                    <main className="flex-1 w-full h-full overflow-x-hidden relative bg-background">
                       {children}
                     </main>
                   </div>
