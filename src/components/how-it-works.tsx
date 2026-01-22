@@ -6,21 +6,23 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 const steps = [
   {
     icon: (
-      <span role="img" aria-label="Videojuegos, cine, libros">
-        <Gamepad2 className="w-6 h-6" />
-        <Clapperboard className="w-6 h-6" />
-        <BookOpen className="w-6 h-6" />
-      </span>
+      <div className="flex gap-1">
+        <Gamepad2 className="w-5 h-5" />
+        <Clapperboard className="w-5 h-5" />
+        <BookOpen className="w-5 h-5" />
+      </div>
     ),
-    title: '1️⃣ Elige tu temática favorita',
+    /* SEO: "Temática" + "Anime/Videojuegos" ayuda a captar búsquedas de nicho */
+    title: '1️⃣ Elige tu universo favorito',
     description:
-      'Selecciona entre videojuegos, series, películas o cómics para tu caja friki personalizada y empieza a crear tu FrikiBox única.',
+      'Selecciona la temática de tu caja: desde Anime y Videojuegos hasta Cine, Series o Cómics. El punto de partida para tu regalo geek perfecto.',
   },
   {
-    icon: <CheckCircle className="w-8 h-8 text-primary" role="img" aria-label="Personalización de caja" />,
-    title: '2️⃣ Personaliza tu FrikiBox',
+    icon: <CheckCircle className="w-8 h-8 text-primary" role="img" aria-label="Personalización de mystery box" />,
+    /* SEO: Uso de "Mystery Box" y "Funko Pop", términos con altísimo volumen */
+    title: '2️⃣ Configura tu Mystery Box',
     description:
-      'Agrega Funko Pop, camisetas y accesorios geek a tu caja. Personaliza cada detalle y crea un regalo perfecto o tu propio tesoro geek.',
+      'Añade figuras Funko Pop, camisetas de tus héroes y merchandising oficial. Tú decides el contenido para que sea una caja sorpresa 100% a medida.',
   },
   {
     icon: (
@@ -36,7 +38,7 @@ const steps = [
         strokeLinejoin="round"
         className="text-primary"
         role="img"
-        aria-label="Entrega a domicilio"
+        aria-label="Regalo original a domicilio"
       >
         <path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v2" />
         <path d="m21 16-7 4-7-4" />
@@ -45,9 +47,10 @@ const steps = [
         <path d="M2 12h20" />
       </svg>
     ),
-    title: '3️⃣ Recíbela y sorprende',
+    /* SEO: "Regalo original" y "fans" */
+    title: '3️⃣ El regalo original perfecto',
     description:
-      'Tu FrikiBox llegará a tu puerta, empaquetada y lista para regalar o disfrutar. La manera más fácil de sorprender a cualquier fan geek.',
+      'Recibe tu pack personalizado en casa, empaquetado y listo para sorprender. La forma más fácil de acertar con un regalo para fans y coleccionistas.',
   },
 ];
 
@@ -55,16 +58,16 @@ export default function HowItWorks() {
   return (
     <section id="how-it-works" className="bg-card py-20 flex justify-center">
       <div className="container px-4 md:px-6 flex flex-col items-center text-center">
-        {/* Encabezado */}
+        {/* Encabezado optimizado para SEO */}
         <div className="mb-16 max-w-3xl">
           <h2 className="text-3xl sm:text-5xl font-headline font-bold animate-fade-in-down">
-            ¿Cómo crear tu FrikiBox?
+            ¿Cómo conseguir tu Caja Regalo Friki?
           </h2>
           <p className="text-primary font-medium mt-2 animate-fade-in-down">
-            🎁 Tres pasos sencillos para obtener tu caja friki personalizada
+            🎁 Diseña tu propio pack de merchandising en 3 sencillos pasos
           </p>
           <p className="mt-4 text-lg text-muted-foreground animate-fade-in-up">
-            Elige tus productos favoritos, personaliza cada detalle y recibe tu FrikiBox lista para regalar o disfrutar por ti mismo.
+            Crea una experiencia única para gamers y amantes del anime. Elige los productos, personaliza el contenido y nosotros nos encargamos de que sea inolvidable.
           </p>
         </div>
 
@@ -89,7 +92,7 @@ export default function HowItWorks() {
           ))}
         </div>
 
-        {/* CTA */}
+        {/* CTA con texto de acción claro */}
         <div className="flex justify-center mt-12 animate-fade-in-up" style={{ animationDelay: '0.9s' }}>
           <Button
             asChild
@@ -97,7 +100,7 @@ export default function HowItWorks() {
             variant="outline"
             className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 ease-in-out hover:scale-105"
           >
-            <Link href="/personalize">¡Personaliza tu FrikiBox ahora!</Link>
+            <Link href="/personalize">Empezar a diseñar mi caja sorpresa</Link>
           </Button>
         </div>
       </div>

@@ -12,8 +12,10 @@ import { useCart } from '../../context/cart-context';
 import { useToast } from "../../hooks/use-toast";
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '../../components/ui/skeleton';
-import type { Metadata } from "next";
 
+// NOTA SEO: En Next.js App Router, los metadatos deben ir en un archivo de servidor (page.tsx).
+// Si este archivo es tu page.tsx, deberías separar el cliente a un componente hijo.
+// Pero aquí optimizo los textos para que Google los indexe mejor:
 
 export default function ProductsPage() {
   const { addToCart } = useCart();
@@ -24,17 +26,11 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const metadata: Metadata = {
-  title: "Productos Frikis y Regalos Geek",
-  description: "Descubre productos frikis: figuras, merchandising y regalos geek.",
-};
-
-  // --- Fetch productos desde la API ---
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch('https://frikibox-backend.vercel.app/products/all'); // tu endpoint
+        const res = await fetch('https://frikibox-backend.vercel.app/products/all');
         if (!res.ok) throw new Error('Error al cargar productos');
         const data = await res.json();
         setProducts(data);
@@ -49,10 +45,10 @@ export default function ProductsPage() {
         setIsLoading(false);
       }
     };
-
     fetchProducts();
   }, []);
 
+  // ... (groupedFranchises y filteredAndSortedProducts se mantienen igual)
   const groupedFranchises = useMemo(() => {
     if (!products) return {};
     const groups: Record<string, Set<string>> = {};
@@ -72,13 +68,10 @@ export default function ProductsPage() {
 
   const filteredAndSortedProducts = useMemo(() => {
     if (!products) return [];
-
     let productsToShow = products;
     if (selectedFranchise !== 'all') {
         productsToShow = products.filter(p => p.mainFranchise === selectedFranchise);
     }
-
-    // Filter by search term
     const filtered = productsToShow.filter(product => {
       const term = searchTerm.toLowerCase();
       return (
@@ -86,21 +79,16 @@ export default function ProductsPage() {
           product.tags?.some((tag: string) => tag.toLowerCase().includes(term))
       );
     });
-
-    // Sort by name
     return filtered.sort((a, b) => a.name.localeCompare(b.name));
-
   }, [products, searchTerm, selectedFranchise]);
 
   const handleAddToCart = (e: React.MouseEvent, product: any) => {
     e.preventDefault();
     e.stopPropagation();
-
     if (product.category === 'clothing' || product.variants) {
       router.push(`/product/${product.id}`);
       return;
     }
-
     addToCart(product);
     toast({
       title: "¡Añadido al carrito!",
@@ -113,9 +101,13 @@ export default function ProductsPage() {
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
           <div className="space-y-2">
-            <h1 className="text-3xl font-headline font-bold tracking-tighter sm:text-5xl animate-fade-in-down">Todo nuestro catálogo</h1>
+            {/* SEO: H1 con palabras clave transaccionales */}
+            <h1 className="text-3xl font-headline font-bold tracking-tighter sm:text-5xl animate-fade-in-down">
+              Merchandising Oficial y Regalos para Gamers
+            </h1>
             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed animate-fade-in-up">
-              Explora todos los productos disponibles y encuentra tus próximos favoritos.
+              {/* SEO: Descripción rica en keywords de nicho */}
+              Encuentra las mejores <strong>figuras de colección, Funko Pop y ropa geek</strong> de tus sagas favoritas. El catálogo más completo para coleccionistas de anime, series y videojuegos.
             </p>
           </div>
         </div>
@@ -125,10 +117,11 @@ export default function ProductsPage() {
                  <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                  <Select value={selectedFranchise} onValueChange={setSelectedFranchise} disabled={isLoading}>
                     <SelectTrigger className="pl-10">
-                        <SelectValue placeholder="Filtrar por saga..." />
+                        {/* SEO: El placeholder ayuda a dar contexto */}
+                        <SelectValue placeholder="Filtrar por saga (Marvel, Anime...)" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">Todas las sagas</SelectItem>
+                        <SelectItem value="all">Todas las franquicias</SelectItem>
                         {Object.entries(groupedFranchises).map(([category, franchises]) => (
                             <SelectGroup key={category}>
                                 <SelectLabel>{category}</SelectLabel>
@@ -144,7 +137,8 @@ export default function ProductsPage() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                     type="search"
-                    placeholder="Buscar producto..."
+                    /* SEO: Placeholder que sugiere búsquedas populares */
+                    placeholder="Buscar Funko, camisetas, tazas..."
                     className="w-full pl-10"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -165,7 +159,7 @@ export default function ProductsPage() {
             </div>
         ) : (
             <div className='text-center text-muted-foreground py-10 col-span-full'>
-                No se encontraron productos con esos filtros.
+                No se han encontrado productos de esta temática. Intenta con otra búsqueda.
             </div>
         )}
       </div>
@@ -173,11 +167,11 @@ export default function ProductsPage() {
   );
 }
 
-// -------------------- ProductCard y ProductCardSkeleton --------------------
+// -------------------- ProductCard con SEO en Imágenes --------------------
 function ProductCard({ product, handleAddToCart }: { product: any, handleAddToCart: (e: React.MouseEvent, product: any) => void }) {
   const getButtonText = (product: any) => {
-    if (product.category === 'clothing' || product.variants) return 'Ver Opciones';
-    return 'Añadir';
+    if (product.category === 'clothing' || product.variants) return 'Ver detalles';
+    return 'Comprar ahora';
   };
 
   return (
@@ -186,21 +180,25 @@ function ProductCard({ product, handleAddToCart }: { product: any, handleAddToCa
         <CardContent className="p-0 relative aspect-square">
           <Image
             src={product.image_url}
-            alt={product.name}
+            /* SEO: Alt dinámico para que Google Imágenes te encuentre */
+            alt={`${product.name} - Merchandising oficial ${product.mainFranchise || ''}`}
             fill
             className="object-cover w-full h-full transition-all duration-500 group-hover:scale-105"
           />
           {product.image_url_back && (
             <Image
               src={product.image_url_back}
-              alt={`${product.name} (back)`}
+              alt={`${product.name} (vista trasera)`}
               fill
               className="object-cover w-full h-full transition-all duration-500 opacity-0 group-hover:opacity-100"
             />
           )}
         </CardContent>
         <CardHeader>
-          <CardTitle className="text-lg transition-colors group-hover:text-primary">{product.name}</CardTitle>
+          {/* SEO: Usar una etiqueta de título para el nombre del producto es bueno para la jerarquía */}
+          <CardTitle className="text-lg transition-colors group-hover:text-primary">
+            {product.name}
+          </CardTitle>
         </CardHeader>
         <CardFooter className="flex justify-between items-center mt-auto pt-4">
           <span className="text-lg font-bold">{product.price ? `${product.price.toFixed(2)}€` : '0.00€'}</span>

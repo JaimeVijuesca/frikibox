@@ -11,7 +11,8 @@ export default function Hero() {
       {heroImage && (
         <Image
           src={heroImage.imageUrl}
-          alt="FrikiBox personalizada con Funko Pop, camisetas y accesorios geek"
+          /* SEO: Alt optimizado con palabras clave de búsqueda */
+          alt="Caja regalo friki personalizada con Funko Pop y merchandising de anime"
           fill
           className="object-cover -z-10 scale-105"
           priority
@@ -25,13 +26,15 @@ export default function Hero() {
               className="font-headline text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter animate-fade-in-down"
               style={{ animationDelay: '0.2s' }}
             >
-              Crea tu FrikiBox Personalizada
+              {/* SEO: H1 con intención de búsqueda clara: Caja Regalo + Friki */}
+              La Caja Regalo Friki y Mystery Box que tú Diseñas
             </h1>
             <p
               className="mx-auto max-w-[700px] text-lg md:text-xl animate-fade-in-up"
               style={{ animationDelay: '0.4s' }}
             >
-              Diseña tu caja geek con Funko Pop, camisetas y accesorios de tus videojuegos, series y cómics favoritos. ¡Recíbela lista para regalar!
+              {/* SEO: Párrafo con keywords de alto volumen: Regalo original, anime, merchandising */}
+              Crea tu propia <strong>caja sorpresa personalizada</strong> con Funkos, camisetas y merchandising oficial de tus series, anime y videojuegos favoritos. ¡El regalo geek más original, listo para enviar!
             </p>
           </div>
 
@@ -41,7 +44,8 @@ export default function Hero() {
               size="lg"
               className="bg-accent text-accent-foreground hover:bg-accent/90 transition-transform duration-300 ease-in-out hover:scale-105"
             >
-              <Link href="/personalize">Personaliza tu FrikiBox ahora</Link>
+              {/* SEO: El texto del botón ahora es una acción con palabra clave */}
+              <Link href="/personalize">Personalizar mi Caja Sorpresa</Link>
             </Button>
           </div>
         </div>
