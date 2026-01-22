@@ -7,7 +7,13 @@ import { useState, useEffect } from "react";
 import { useCart } from "../../../context/cart-context";
 import { useToast } from "../../../hooks/use-toast";
 import { Button } from "../../../components/ui/button";
-import { ShoppingCart, Truck, ShieldCheck, Star } from "lucide-react";
+import {
+  ShoppingCart,
+  Truck,
+  ShieldCheck,
+  Star,
+  ChevronLeft,
+} from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -16,12 +22,6 @@ import {
   SelectValue,
 } from "../../../components/ui/select";
 import { Label } from "../../../components/ui/label";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../../../components/ui/card";
 import { RadioGroup, RadioGroupItem } from "../../../components/ui/radio-group";
 import { Badge } from "../../../components/ui/badge";
 import { Skeleton } from "../../../components/ui/skeleton";
@@ -30,7 +30,6 @@ import { cn } from "../../../lib/utils";
 export default function ProductDetailPage() {
   const params = useParams();
   const id = typeof params.id === "string" ? params.id : "";
-
   const { addToCart } = useCart();
   const { toast } = useToast();
 
@@ -41,36 +40,32 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     if (!id) return;
-
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`https://frikibox-backend.vercel.app/products/${id}`);
+        const res = await fetch(
+          `https://frikibox-backend.vercel.app/products/${id}`,
+        );
         if (!res.ok) throw new Error("Producto no encontrado");
         const data = await res.json();
         setProduct(data);
-
         if (data.variants && data.variants.length > 0) {
           setSelectedVariant(data.variants[0]);
         }
       } catch (err: any) {
-        console.error(err);
         setProduct(null);
       } finally {
         setLoading(false);
       }
     };
-
     fetchProduct();
   }, [id]);
 
   if (loading) return <ProductDetailSkeleton />;
   if (!product) notFound();
 
-  // Lógica de añadir al carrito restaurada
   const handleAddToCart = () => {
     if (!product) return;
-
     let productToAdd: any;
     let sizeInfo: string | undefined = undefined;
     let toastDescription: string;
@@ -81,11 +76,9 @@ export default function ProductDetailPage() {
         id: selectedVariant.id,
         name: selectedVariant.name,
         price: selectedVariant.price,
-        description: selectedVariant.description,
-        variants: undefined,
         imageUrl: product.image_url,
       };
-      toastDescription = `${selectedVariant.name} se ha añadido al carrito.`;
+      toastDescription = `${selectedVariant.name} añadido.`;
     } else if (product.category === "clothing" && selectedSize) {
       sizeInfo = selectedSize;
       productToAdd = {
@@ -93,139 +86,145 @@ export default function ProductDetailPage() {
         id: `${product.id}-${selectedSize}`,
         imageUrl: product.image_url,
       };
-      toastDescription = `${product.name} (Talla: ${selectedSize}) se ha añadido al carrito.`;
+      toastDescription = `${product.name} (Talla: ${selectedSize}) añadido.`;
     } else {
-      productToAdd = {
-        ...product,
-        imageUrl: product.image_url,
-      };
-      toastDescription = `${product.name} se ha añadido al carrito.`;
+      productToAdd = { ...product, imageUrl: product.image_url };
+      toastDescription = `${product.name} añadido.`;
     }
 
     if (product.category === "clothing" && !selectedSize) {
-      toast({
-        variant: "destructive",
-        title: "¡Selecciona una talla!",
-        description: "Por favor, elige una talla antes de añadir el producto.",
-      });
+      toast({ variant: "destructive", title: "Elige una talla" });
       return;
     }
 
     addToCart(productToAdd, sizeInfo);
-    toast({
-      title: "¡Añadido al carrito!",
-      description: toastDescription,
-    });
+    toast({ title: "¡Añadido!", description: toastDescription });
   };
 
   const displayPrice = selectedVariant ? selectedVariant.price : product.price;
-  const displayDescription = selectedVariant ? selectedVariant.description : product.description;
+  const displayDescription = selectedVariant
+    ? selectedVariant.description
+    : product.description;
   const displayName = selectedVariant ? selectedVariant.name : product.name;
 
   return (
-    <section className="py-12 md:py-24">
-      {/* SEO: JSON-LD para Google */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org/",
-            "@type": "Product",
-            "name": displayName,
-            "image": [product.image_url],
-            "description": displayDescription,
-            "brand": { "@type": "Brand", "name": product.mainFranchise || "FrikiBox" },
-            "offers": {
-              "@type": "Offer",
-              "price": displayPrice,
-              "priceCurrency": "EUR",
-              "availability": "https://schema.org/InStock",
-              "url": `https://frikibox.vercel.app/product/${product.id}`
-            }
-          }),
-        }}
-      />
+    // Reducimos el padding vertical y usamos min-h de forma controlada
+    <section className="py-6 md:py-12 bg-background min-h-[70vh]">
+      <div className="container px-4 md:px-6 mx-auto">
+        {/* Botón de volver atrás para mejorar UX */}
+        <Link
+          href="/products"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-6"
+        >
+          <ChevronLeft className="w-4 h-4 mr-1" /> Volver a productos
+        </Link>
 
-      <div className="container px-4 md:px-6">
-        <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-          {/* Imagen */}
-          <div className="relative aspect-square">
-            <Image
-              src={product.image_url}
-              alt={`${displayName} - Merchandising Oficial de ${product.mainFranchise || 'FrikiBox'}`}
-              fill
-              className="object-contain rounded-lg shadow-lg"
-              priority
-            />
-            {product.image_url_back && (
+        {/* items-start es la clave para evitar el hueco blanco gigante */}
+        <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-start">
+          {/* LADO IZQUIERDO: IMAGEN (Sticky para que no se mueva al hacer scroll en texto largo) */}
+          <div className="md:sticky md:top-24">
+            <div className="relative aspect-square w-full max-w-[500px] mx-auto overflow-hidden rounded-xl bg-white shadow-sm border">
               <Image
-                src={product.image_url_back}
-                alt={`${displayName} (vista trasera)`}
+                src={product.image_url}
+                alt={displayName}
                 fill
-                className="object-contain rounded-lg shadow-lg absolute top-0 left-0 opacity-0 hover:opacity-100 transition-opacity"
+                className="object-contain p-4"
+                priority
               />
-            )}
+              {product.image_url_back && (
+                <Image
+                  src={product.image_url_back}
+                  alt="Vista trasera"
+                  fill
+                  className="object-contain p-4 absolute top-0 left-0 opacity-0 hover:opacity-100 transition-opacity bg-white"
+                />
+              )}
+            </div>
           </div>
 
-          {/* Detalles */}
-          <div className="flex flex-col justify-center space-y-6">
-            <nav className="text-sm text-muted-foreground mb-2">
-              <Link href="/products" className="hover:text-primary">Productos</Link> / {product.mainFranchise}
-            </nav>
-
+          {/* LADO DERECHO: DETALLES */}
+          <div className="flex flex-col space-y-6">
             <div>
-              <h1 className="text-3xl lg:text-4xl font-bold tracking-tight">{displayName}</h1>
-              <div className="flex items-center gap-2 mt-2">
-                <Badge variant="secondary" className="bg-green-100 text-green-700">Producto Oficial</Badge>
-                <div className="flex text-yellow-500"><Star size={16} fill="currentColor"/><Star size={16} fill="currentColor"/><Star size={16} fill="currentColor"/><Star size={16} fill="currentColor"/><Star size={16} fill="currentColor"/></div>
-              </div>
-              <p className="text-3xl font-bold mt-4 text-primary">
-                {displayPrice ? `${displayPrice.toFixed(2)}€` : '0.00€'}
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <h2 className="text-lg font-semibold">Descripción</h2>
-              <p className="text-muted-foreground text-lg leading-relaxed">
-                {displayDescription || "No hay descripción disponible para este producto."}
-              </p>
-            </div>
-
-            {/* Opciones (Variantes/Tallas) */}
-            <div className="pt-4 border-t">
-              {product.variants ? (
-                <RadioGroup
-                  value={selectedVariant?.id}
-                  onValueChange={(id) => setSelectedVariant(product.variants.find((v:any) => v.id === id))}
-                  className="grid gap-3"
-                >
-                  <Label className="text-lg font-medium">Elige tu opción:</Label>
-                  {product.variants.map((variant:any) => (
-                    <Card 
-                      key={variant.id} 
-                      className={cn("cursor-pointer transition-all", selectedVariant?.id === variant.id && "border-primary ring-1 ring-primary")}
-                      onClick={() => setSelectedVariant(variant)}
-                    >
-                      <CardHeader className="flex flex-row items-center gap-4 p-4">
-                        <RadioGroupItem value={variant.id} id={variant.id} />
-                        <div className="flex-1 flex justify-between items-center">
-                          <span className="font-medium">{variant.name}</span>
-                          <span className="font-bold">{variant.price.toFixed(2)}€</span>
-                        </div>
-                      </CardHeader>
-                    </Card>
+              <Badge
+                variant="outline"
+                className="mb-2 uppercase tracking-widest text-[10px]"
+              >
+                {product.mainFranchise || product.category}
+              </Badge>
+              <h1 className="text-3xl md:text-4xl font-bold text-balance">
+                {displayName}
+              </h1>
+              <div className="flex items-center gap-4 mt-3">
+                <span className="text-3xl font-extrabold text-primary">
+                  {displayPrice ? `${displayPrice.toFixed(2)}€` : "---"}
+                </span>
+                <div className="flex text-yellow-500 items-center">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={14} fill="currentColor" />
                   ))}
-                </RadioGroup>
+                  <span className="text-xs text-muted-foreground ml-2">
+                    (Oficial)
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="prose prose-sm text-muted-foreground">
+              <h3 className="text-foreground font-semibold mb-1">
+                Sobre este producto:
+              </h3>
+              <p className="leading-relaxed">{displayDescription}</p>
+            </div>
+
+            {/* OPCIONES */}
+            <div className="space-y-4 pt-4 border-t">
+              {product.variants ? (
+                <div className="grid gap-3">
+                  <Label className="font-bold">Selecciona una opción:</Label>
+                  <RadioGroup
+                    value={selectedVariant?.id}
+                    onValueChange={(id) =>
+                      setSelectedVariant(
+                        product.variants.find((v: any) => v.id === id),
+                      )
+                    }
+                  >
+                    {product.variants.map((variant: any) => (
+                      <div
+                        key={variant.id}
+                        onClick={() => setSelectedVariant(variant)}
+                        className={cn(
+                          "flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-all",
+                          selectedVariant?.id === variant.id
+                            ? "border-primary bg-primary/5 ring-1 ring-primary"
+                            : "hover:bg-accent",
+                        )}
+                      >
+                        <div className="flex items-center gap-2">
+                          <RadioGroupItem value={variant.id} />
+                          <span className="text-sm font-medium">
+                            {variant.name}
+                          </span>
+                        </div>
+                        <span className="font-bold text-sm">
+                          {variant.price.toFixed(2)}€
+                        </span>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
               ) : product.category === "clothing" && product.availableSizes ? (
-                <div className="flex flex-col gap-3">
-                  <Label htmlFor="size-select" className="text-lg font-medium">Seleccionar Talla:</Label>
+                <div className="space-y-2">
+                  <Label className="font-bold">Talla disponible:</Label>
                   <Select onValueChange={setSelectedSize}>
-                    <SelectTrigger id="size-select" className="w-[180px]">
-                      <SelectValue placeholder="Elige tu talla" />
+                    <SelectTrigger className="w-full md:w-[200px]">
+                      <SelectValue placeholder="Escoger talla" />
                     </SelectTrigger>
                     <SelectContent>
-                      {product.availableSizes.map((size:string) => (
-                        <SelectItem key={size} value={size}>{size}</SelectItem>
+                      {product.availableSizes.map((size: string) => (
+                        <SelectItem key={size} value={size}>
+                          {size}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -233,26 +232,30 @@ export default function ProductDetailPage() {
               ) : null}
             </div>
 
-            {/* BOTÓN REPARADO */}
-            <div className="space-y-4">
+            {/* ACCIÓN Y CONFIANZA */}
+            <div className="flex flex-col gap-4 pt-2">
               <Button
                 size="lg"
-                className="w-full md:w-auto px-12 py-6 text-lg" // Arreglado el typo "texZt"
-                onClick={handleAddToCart} // Función conectada de nuevo
+                className="w-full h-14 text-lg font-bold shadow-xl shadow-primary/20"
+                onClick={handleAddToCart}
                 disabled={product.category === "clothing" && !selectedSize}
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 Añadir al carrito
               </Button>
-              
-              <div className="grid grid-cols-2 gap-4 pt-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Truck size={18} className="text-primary" />
-                  <span>Envío 24/48h</span>
+
+              <div className="grid grid-cols-2 gap-4 text-[13px] border-t pt-6">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Truck className="h-5 w-5 text-primary" />
+                  <span>
+                    {product.category === "clothing"
+                      ? "Entrega estimada: 5-7 días hábiles" // Las camisetas suelen tardar más
+                      : "Envío estimado: 3-5 días hábiles"}
+                  </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <ShieldCheck size={18} className="text-primary" />
-                  <span>Pago Seguro</span>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <ShieldCheck className="h-5 w-5 text-primary" />
+                  <span>Garantía Oficial</span>
                 </div>
               </div>
             </div>
@@ -263,20 +266,19 @@ export default function ProductDetailPage() {
   );
 }
 
+// Skeleton ajustado para no crear huecos
 function ProductDetailSkeleton() {
   return (
-    <section className="py-12 md:py-24">
-      <div className="container px-4 md:px-6">
-        <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-          <Skeleton className="aspect-square rounded-lg" />
-          <div className="space-y-6">
-            <Skeleton className="h-10 w-3/4" />
-            <Skeleton className="h-6 w-1/4" />
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-12 w-48" />
-          </div>
+    <div className="container px-4 py-12 mx-auto">
+      <div className="grid md:grid-cols-2 gap-12 items-start">
+        <Skeleton className="aspect-square w-full rounded-xl" />
+        <div className="space-y-6">
+          <Skeleton className="h-10 w-3/4" />
+          <Skeleton className="h-6 w-1/4" />
+          <Skeleton className="h-40 w-full" />
+          <Skeleton className="h-14 w-full" />
         </div>
       </div>
-    </section>
+    </div>
   );
 }
